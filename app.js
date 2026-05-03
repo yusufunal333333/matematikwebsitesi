@@ -156,8 +156,6 @@ const quizSorulari = [
     soru: "Pisagor antik hangi uygarlığa ait bir matematikçidir?",
     secenekler: ["Mısır", "Mezopotamya", "Yunan", "Çin"],
     dogru: 2
-  }
-];
   },
   {
     soru: "Fibonacci dizisinde 1, 1, 2, 3, 5'ten sonra gelen sayı kaçtır?",
