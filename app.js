@@ -30,123 +30,134 @@ function liderlikYaz(liste) {
 
 // Quiz data - 25 questions (12 discoveries, 7 about mathematicians, 6 general math)
 const quizSorulari = [
-  // === 12 SORU: Matematikçilerin Buluşları Hakkında ===
+  // === TEMEL 17 SORU (10. Sınıf Seviyesi) ===
   {
-    soru: "Pisagor Teoremi'nin formülü hangisidir?",
-    secenekler: ["a + b = c", "a² + b² = c²", "a × b = c", "a² − b² = c²"],
+    soru: "Pisagor Teoremi dik üçgenlerde hangi ilişkiyi gösterir?",
+    secenekler: ["a + b = c", "a² + b² = c²", "a × b = c", "a - b = c"],
     dogru: 1
   },
   {
-    soru: "Öklid'in \"Elementler\" kitabı kaç ciltten oluşur?",
-    secenekler: ["5", "9", "13", "20"],
+    soru: "2x + 5 = 13 denkleminin çözümü x kaçtır?",
+    secenekler: ["3", "4", "5", "6"],
+    dogru: 1
+  },
+  {
+    soru: "Bir dairenin çrafi = 2πr olarak hesaplanır. Yarıçapı 5 cm olan dairenin çevresi kaç cm'dir?",
+    secenekler: ["10π", "15π", "25π", "5π"],
+    dogru: 0
+  },
+  {
+    soru: "Hangi sayıyı 3 ile çarpıp 2 eklerseniz 11 elde edersiniz?",
+    secenekler: ["2", "3", "4", "5"],
     dogru: 2
   },
   {
-    soru: "El-Hârizmî'nin \"cebir\" kelimesinin kaynağı olan eserinin konusu nedir?",
-    secenekler: ["Geometri teoremleri", "Denklemlerin sistematik çözüm yöntemleri", "Astronomi tabloları", "Sayılar teorisi"],
+    soru: "Bir karesin alanı 64 cm² ise kenar uzunluğu kaç cm'dir?",
+    secenekler: ["6", "7", "8", "9"],
+    dogru: 2
+  },
+  {
+    soru: "Pisagor Türkiye'de mi yoksa Antik Yunanistan'da mı yaşamıştır?",
+    secenekler: ["Türkiye", "Antik Yunanistan", "Mısır", "Babil"],
     dogru: 1
   },
   {
-    soru: "Gauss'un bulduğu 1'den 100'e kadar toplama formülü hangisidir?",
-    secenekler: ["100 × 100 / 2", "(100 × 101) / 2", "100 + 101", "100 × 99 / 2"],
+    soru: "85 ÷ 5 işleminin sonucu kaçtır?",
+    secenekler: ["15", "16", "17", "18"],
+    dogru: 2
+  },
+  {
+    soru: "3² + 4² = ? (Pisagor örneği)",
+    secenekler: ["20", "24", "25", "30"],
+    dogru: 2
+  },
+  {
+    soru: "Bir diktörtgenin uzun kenarı 8 cm, kısa kenarı 5 cm ise alanı kaç cm²'dir?",
+    secenekler: ["13", "26", "40", "30"],
+    dogru: 2
+  },
+  {
+    soru: "15 ile 25'in ortalaması kaçtır?",
+    secenekler: ["18", "19", "20", "21"],
+    dogru: 2
+  },
+  {
+    soru: "100'ün karekökü kaçtır?",
+    secenekler: ["8", "9", "10", "11"],
+    dogru: 2
+  },
+  {
+    soru: "30% of 200 kaçtır?",
+    secenekler: ["50", "60", "70", "80"],
     dogru: 1
   },
   {
-    soru: "Euler özdeşliği (e^(iπ) + 1 = 0) kaç temel matematik sabitini birleştirir?",
+    soru: "Bir beşgenin kaç köşesi vardır?",
+    secenekler: ["4", "5", "6", "7"],
+    dogru: 1
+  },
+  {
+    soru: "2⁵ (2 üzeri 5) kaçtır?",
+    secenekler: ["10", "25", "32", "64"],
+    dogru: 2
+  },
+  {
+    soru: "√144 kaçtır?",
+    secenekler: ["10", "11", "12", "13"],
+    dogru: 2
+  },
+  {
+    soru: "Kaç tane prime number (asal sayı) 1 ile 10 arasında vardır?",
+    secenekler: ["3", "4", "5", "6"],
+    dogru: 1
+  },
+  {
+    soru: "2x - 3 = 7 denkleminde x kaçtır?",
     secenekler: ["3", "4", "5", "6"],
     dogru: 2
   },
-  {
-    soru: "Arf değişmezi hangi matematiksel yapıların sınıflandırılmasında kullanılır?",
-    secenekler: ["Üçgenler", "Kuadratik formlar", "Matrisler", "Fonksiyonlar"],
-    dogru: 1
-  },
-  {
-    soru: "Öklid'in ispatladığı \"asal sayılar\" hakkındaki önemli sonuç nedir?",
-    secenekler: ["Hepsi tektir", "Sonsuzdur", "Hepsi 1'e bölünür", "Sadece 25 tanedir"],
-    dogru: 1
-  },
-  {
-    soru: "Euler'in Königsberg Köprüleri problemiyle temelleri atılan matematik dalı hangisidir?",
-    secenekler: ["Cebir", "İstatistik", "Graf teorisi", "Analiz"],
-    dogru: 2
-  },
-  {
-    soru: "El-Hârizmî'nin Avrupa'ya tanıttığı sayı sistemi hangisidir?",
-    secenekler: ["Roma rakamları", "Hint-Arap rakamları (0-9)", "İkili (binary) sistem", "Altmışlık sistem"],
-    dogru: 1
-  },
-  {
-    soru: "Gauss dağılımının (normal dağılım) diğer adı nedir?",
-    secenekler: ["Düz eğri", "Çan eğrisi", "Sinüs eğrisi", "Parabolik eğri"],
-    dogru: 1
-  },
-  {
-    soru: "Çokyüzlüler için Euler formülü V − E + F kaça eşittir?",
-    secenekler: ["0", "1", "2", "3"],
-    dogru: 2
-  },
-  {
-    soru: "Hasse–Arf teoremi hangi matematik dalıyla ilgilidir?",
-    secenekler: ["Geometri", "Cebirsel sayı teorisi", "Olasılık", "İstatistik"],
-    dogru: 1
-  },
-  // === 7 SORU: Matematikçilerin Kendileri Hakkında ===
-  {
-    soru: "Pisagor'un kurduğu okulun bulunduğu şehir hangisidir?",
-    secenekler: ["Atina", "İskenderiye", "Kroton", "Roma"],
-    dogru: 2
-  },
+  // === 8 SORU: Matematikçiler Hakkında ===
   {
     soru: "Cahit Arf'ın portresi kaç TL'lik banknotun üzerindedir?",
     secenekler: ["5 TL", "10 TL", "20 TL", "50 TL"],
     dogru: 1
   },
   {
-    soru: "Euler hayatının son yıllarında hangi engelle karşılaşmasına rağmen çalışmaya devam etmiştir?",
-    secenekler: ["Sağırlık", "Körlük", "Felç", "Hafıza kaybı"],
+    soru: "Pisagor'un ünlü teoremi hangi tür üçgenlerle ilgilidir?",
+    secenekler: ["İkizkenar", "Dik", "Eşkenar", "Dar açılı"],
     dogru: 1
   },
   {
-    soru: "Gauss kaç yaşında 1'den 100'e kadar sayıları saniyeler içinde toplamıştır?",
-    secenekler: ["5", "7", "10", "12"],
+    soru: "Gauss kimdir?",
+    secenekler: ["Mimar", "Matematikçi", "Hekim", "Şarkıcı"],
     dogru: 1
   },
   {
-    soru: "El-Hârizmî hangi şehirdeki Beytü'l-Hikme'de (Bilgelik Evi) çalışmıştır?",
-    secenekler: ["Kahire", "Bağdat", "Şam", "Medine"],
+    soru: "Euler hangi ülkede yaşamıştır?",
+    secenekler: ["İtalya", "Rusya", "İsviçre", "Almanya"],
     dogru: 1
   },
   {
-    soru: "Cahit Arf hangi Türk kurumunun kurucu başkanı olmuştur?",
-    secenekler: ["ODTÜ", "TÜBİTAK", "İstanbul Üniversitesi", "YÖK"],
+    soru: "El-Hârizmî'nin adından hangi kelime türemiştir?",
+    secenekler: ["Algoritma", "Cebir", "Geometri", "Trigonometri"],
+    dogru: 0
+  },
+  {
+    soru: "Öklid'in ünlü kitabı ne adıyla anılır?",
+    secenekler: ["Elementler", "Principia", "Summa", "Opus Magnum"],
+    dogru: 0
+  },
+  {
+    soru: "Cahit Arf ne ile ünlü bir Türk matematikçidir?",
+    secenekler: ["Cebir", "Topoloji", "İstatistik", "Geometri"],
     dogru: 1
   },
   {
-    soru: "Öklid, Kral Ptolemaios'a geometri hakkında ne söylemiştir?",
-    secenekler: ["Geometri çok kolaydır", "Geometriye giden kraliyet yolu yoktur", "Geometri gereksizdir", "Herkes geometri bilmeli"],
-    dogru: 1
-  },
-  // === 6 SORU: Genel Matematik ===
-  {
-    soru: "Bir üçgenin iç açıları toplamı kaç derecedir?",
-    secenekler: ["90", "180", "270", "360"],
-    dogru: 1
-  },
-  {
-    soru: "Pi (π) sayısının yaklaşık değeri nedir?",
-    secenekler: ["2,14", "3,14", "4,14", "1,14"],
-    dogru: 1
-  },
-  {
-    soru: "144'ün karekökü kaçtır?",
-    secenekler: ["11", "12", "13", "14"],
-    dogru: 1
-  },
-  {
-    soru: "Bir küpün kaç yüzeyi vardır?",
-    secenekler: ["4", "6", "8", "12"],
-    dogru: 1
+    soru: "Pisagor antik hangi uygarlığa ait bir matematikçidir?",
+    secenekler: ["Mısır", "Mezopotamya", "Yunan", "Çin"],
+    dogru: 2
+  }
+];
   },
   {
     soru: "Fibonacci dizisinde 1, 1, 2, 3, 5'ten sonra gelen sayı kaçtır?",
