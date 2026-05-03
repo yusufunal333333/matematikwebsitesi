@@ -87,7 +87,7 @@ const quizSorulari = [
     dogru: 2
   },
   {
-    soru: "30% of 200 kaçtır?",
+    soru: "200'ün %30'u kaçtır?",
     secenekler: ["50", "60", "70", "80"],
     dogru: 1
   },
@@ -107,8 +107,8 @@ const quizSorulari = [
     dogru: 2
   },
   {
-    soru: "Kaç tane prime number (asal sayı) 1 ile 10 arasında vardır?",
-    secenekler: ["3", "4", "5", "6"],
+    soru: "1 ile 100 arasında kaç tane asal sayı vardır?",
+    secenekler: ["20", "25", "30", "50"],
     dogru: 1
   },
   {
