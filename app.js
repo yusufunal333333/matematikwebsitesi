@@ -42,7 +42,7 @@ const quizSorulari = [
     dogru: 1
   },
   {
-    soru: "Bir dairenin çrafi = 2πr olarak hesaplanır. Yarıçapı 5 cm olan dairenin çevresi kaç cm'dir?",
+    soru: "Bir dairenin çevresi = 2πr olarak hesaplanır. Yarıçapı 5 cm olan dairenin çevresi kaç cm'dir?",
     secenekler: ["10π", "15π", "25π", "5π"],
     dogru: 0
   },
