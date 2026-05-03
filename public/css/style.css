@@ -5,6 +5,24 @@
   box-sizing: border-box;
 }
 
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 /* Base */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -49,7 +67,7 @@ nav {
   position: relative;
 }
 
-/* Hamburger button */
+/* Hamburger button - always visible */
 .hamburger {
   display: flex;
   flex-direction: column;
@@ -89,7 +107,7 @@ nav {
 }
 
 .logo {
-  flex: 1;
+  flex-shrink: 0;
 }
 
 .logo a {
@@ -98,26 +116,23 @@ nav {
   font-weight: bold;
   text-decoration: none;
   white-space: nowrap;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
-/* Nav links - dropdown menu */
+.logo a:hover {
+  opacity: 0.85;
+  transform: scale(1.03);
+  text-decoration: none;
+}
+
+/* Nav links - inline on desktop, dropdown on mobile when hamburger clicked */
 .nav-links {
   list-style: none;
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  padding: 0.5rem 0;
-  min-width: 240px;
-  z-index: 150;
-}
-
-.nav-links.acik {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 .nav-links li {
@@ -126,22 +141,25 @@ nav {
 
 .nav-links a {
   color: rgba(255,255,255,0.9);
-  font-size: 11pt;
-  padding: 0.7rem 1.5rem;
-  transition: background 0.2s, color 0.2s;
+  font-size: 9.5pt;
+  padding: 0.4rem 0.7rem;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
   display: block;
   text-decoration: none;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .nav-links a:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.15);
   color: #fff;
   text-decoration: none;
+  transform: translateY(-1px);
 }
 
 .nav-links a.aktif {
   color: #fbbf24;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.1);
   font-weight: bold;
 }
 
@@ -150,6 +168,7 @@ main {
   max-width: 1100px;
   margin: 2rem auto;
   padding: 0 2rem;
+  animation: fadeIn 0.4s ease-out;
 }
 
 /* Page titles */
@@ -159,6 +178,7 @@ main {
   color: #1e3a5f;
   margin-bottom: 1.5rem;
   text-align: center;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .alt-baslik {
@@ -175,6 +195,13 @@ main {
   padding: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  animation: fadeInUp 0.5s ease-out;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.icerik-kutusu:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
 }
 
 .icerik-kutusu p {
@@ -198,12 +225,14 @@ main {
   color: #fff;
   border-radius: 16px;
   margin-bottom: 2rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .hero h1 {
   font-size: 24pt;
   font-weight: bold;
   margin-bottom: 1rem;
+  animation: fadeInUp 0.7s ease-out;
 }
 
 .hero p {
@@ -226,12 +255,20 @@ main {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: fadeInUp 0.5s ease-out both;
 }
 
+.kart:nth-child(1) { animation-delay: 0.1s; }
+.kart:nth-child(2) { animation-delay: 0.2s; }
+.kart:nth-child(3) { animation-delay: 0.3s; }
+.kart:nth-child(4) { animation-delay: 0.4s; }
+.kart:nth-child(5) { animation-delay: 0.5s; }
+.kart:nth-child(6) { animation-delay: 0.6s; }
+
 .kart:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
 .kart-resim {
@@ -586,12 +623,25 @@ footer {
   }
 
   .nav-links {
-    min-width: 100%;
-    border-radius: 0 0 8px 8px;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    padding: 0.5rem 0;
+    margin-left: 0;
+    gap: 0;
+  }
+
+  .nav-links.acik {
+    display: flex;
   }
 
   .nav-links a {
-    font-size: 11pt;
+    font-size: 10pt;
     padding: 0.8rem 1.2rem;
   }
 
@@ -644,12 +694,13 @@ footer {
   border-radius: 12px;
   padding: 1.2rem;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  animation: fadeInUp 0.4s ease-out both;
 }
 
 .sembol-kart:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
   border-color: #2563eb;
 }
 
@@ -658,6 +709,11 @@ footer {
   font-weight: bold;
   color: #2563eb;
   margin-bottom: 0.5rem;
+  transition: transform 0.3s;
+}
+
+.sembol-kart:hover .sembol-buyuk {
+  transform: scale(1.2);
 }
 
 .sembol-ad {
@@ -917,6 +973,18 @@ footer {
   border-radius: 10px;
   padding: 1.2rem;
   border: 1px solid #bfdbfe;
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.katki-kart:nth-child(1) { animation-delay: 0.1s; }
+.katki-kart:nth-child(2) { animation-delay: 0.2s; }
+.katki-kart:nth-child(3) { animation-delay: 0.3s; }
+.katki-kart:nth-child(4) { animation-delay: 0.4s; }
+
+.katki-kart:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.15);
 }
 
 .katki-baslik {
@@ -1031,6 +1099,26 @@ footer {
 .cebir-tanim {
   font-size: 0.8rem;
   color: #555;
+}
+
+.afis-kaynakca {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e0e0e0;
+}
+.afis-kaynakca h2 {
+  color: #1e3a5f;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+}
+.afis-kaynakca ol {
+  padding-left: 1.5rem;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.8;
+}
+.afis-kaynakca ol li {
+  margin-bottom: 0.3rem;
 }
 
 .afis-alt {
@@ -1281,12 +1369,20 @@ footer {
   padding: 1.2rem 1.5rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   border-left: 5px solid #2563eb;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: slideInLeft 0.4s ease-out both;
 }
 
+.hayat-kart:nth-child(1) { animation-delay: 0.1s; }
+.hayat-kart:nth-child(2) { animation-delay: 0.15s; }
+.hayat-kart:nth-child(3) { animation-delay: 0.2s; }
+.hayat-kart:nth-child(4) { animation-delay: 0.25s; }
+.hayat-kart:nth-child(5) { animation-delay: 0.3s; }
+.hayat-kart:nth-child(6) { animation-delay: 0.35s; }
+
 .hayat-kart:hover {
-  transform: translateX(6px);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+  transform: translateX(8px) scale(1.01);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2);
 }
 
 .hayat-kart:nth-child(1) { border-left-color: #dc2626; }
