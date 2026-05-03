@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matematik Dünyası</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <button class="hamburger" onclick="this.classList.toggle('aktif'); this.parentNode.querySelector('.nav-links').classList.toggle('acik')" aria-label="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="logo">
+        <a href="/">🔢 Matematik Dünyası</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/" class="<%= aktifSayfa === 'anasayfa' ? 'aktif' : '' %>">Ana Sayfa</a></li>
+        <li><a href="/hakkimda" class="<%= aktifSayfa === 'hakkimda' ? 'aktif' : '' %>">Hakkımda</a></li>
+        <li><a href="/matematik-nedir" class="<%= aktifSayfa === 'matematik-nedir' ? 'aktif' : '' %>">Matematik Nedir?</a></li>
+        <li><a href="/semboller" class="<%= aktifSayfa === 'semboller' ? 'aktif' : '' %>">Semboller</a></li>
+        <li><a href="/unlu-matematikciler" class="<%= aktifSayfa === 'matematikçiler' ? 'aktif' : '' %>">Ünlü Matematikçiler</a></li>
+        <li><a href="/afis" class="<%= aktifSayfa === 'afis' ? 'aktif' : '' %>">Afiş</a></li>
+        <li><a href="/hayat-matematikci" class="<%= aktifSayfa === 'hayat-matematikci' ? 'aktif' : '' %>">Hayatıma Yön Verenler</a></li>
+        <li><a href="/matematikci-olmak" class="<%= aktifSayfa === 'matematikci-olmak' ? 'aktif' : '' %>">Matematikçi Olmak</a></li>
+        <li><a href="/quiz" class="<%= aktifSayfa === 'quiz' ? 'aktif' : '' %>">Quiz</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <%- body %>
+  </main>
+
+  <footer>
+    <p>Matematik Dünyası &copy; 2026 – Ortaokul öğrencileri için eğitici matematik sitesi</p>
+  </footer>
+</body>
+</html>

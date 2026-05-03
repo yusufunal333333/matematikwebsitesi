@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+
+<h1 class="sayfa-baslik">Quiz Sonuçları</h1>
+
+<div class="quiz-layout">
+  <div class="quiz-sol">
+    <div class="sonuc-ozet">
+      <h2>Puanınız</h2>
+      <div class="puan"><%= dogru %> / <%= toplam %></div>
+      <p><%= dogru >= 20 ? 'Harika! Matematik bilginiz çok güçlü!' : dogru >= 13 ? 'İyi bir sonuç! Biraz daha çalışarak daha iyisini yapabilirsiniz.' : 'Daha çok çalışmanız gerekiyor. Konuları tekrar gözden geçirin!' %></p>
+    </div>
+
+    <!-- Sonuç Kaydetme Formu -->
+    <div class="kaydet-formu">
+      <h3>📝 Sonucunuzu Kaydedin</h3>
+      <form method="POST" action="/quiz-kaydet">
+        <input type="hidden" name="dogru" value="<%= dogru %>">
+        <input type="hidden" name="toplam" value="<%= toplam %>">
+        <div class="kaydet-alanlar">
+          <input type="text" name="ad" placeholder="Adınız" required maxlength="50" class="kaydet-input">
+          <input type="text" name="soyad" placeholder="Soyadınız" required maxlength="50" class="kaydet-input">
+          <button type="submit" class="kaydet-btn">Kaydet</button>
+        </div>
+      </form>
+    </div>
+
+    <% sonuclar.forEach(function(s, i) { %>
+      <div class="soru-sonuc <%= s.dogruMu ? 'dogru' : 'yanlis' %>">
+        <span class="sonuc-etiket <%= s.dogruMu ? 'dogru' : 'yanlis' %>"><%= s.dogruMu ? 'Doğru' : 'Yanlış' %></span>
+        <h4><%= i + 1 %>. <%= s.soru %></h4>
+        <p>Doğru cevap: <strong><%= s.secenekler[s.dogruIndex] %></strong></p>
+        <% if (!s.dogruMu && !isNaN(s.kullaniciIndex) && s.kullaniciIndex >= 0) { %>
+          <p>Sizin cevabınız: <%= s.secenekler[s.kullaniciIndex] %></p>
+        <% } %>
+      </div>
+    <% }); %>
+
+    <div style="text-align: center; margin: 2rem 0;">
+      <a href="/quiz" style="display:inline-block; background:#2563eb; color:#fff; padding:0.75rem 2rem; border-radius:8px; font-weight:bold;">Tekrar Dene</a>
+    </div>
+  </div>
+
+  <div class="quiz-sag">
+    <div class="liderlik-tablosu">
+      <h3>🏆 En İyi 10</h3>
+      <% if (liderlik.length === 0) { %>
+        <p class="liderlik-bos">Henüz kimse quiz'i tamamlamadı. İlk sen ol!</p>
+      <% } else { %>
+        <ol class="liderlik-listesi">
+          <% liderlik.forEach(function(k, i) { %>
+            <li class="liderlik-satir <%= i === 0 ? 'lider-altin' : i === 1 ? 'lider-gumus' : i === 2 ? 'lider-bronz' : '' %>">
+              <span class="lider-sira"><%= i + 1 %>.</span>
+              <span class="lider-isim"><%= k.ad %> <%= k.soyad %></span>
+              <span class="lider-puan"><%= k.dogru %>/<%= k.toplam %></span>
+            </li>
+          <% }); %>
+        </ol>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

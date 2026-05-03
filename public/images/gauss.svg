@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#ede9fe"/>
+  <circle cx="200" cy="150" r="70" fill="#a78bfa"/>
+  <circle cx="200" cy="150" r="50" fill="#c4b5fd"/>
+  <text x="200" y="160" text-anchor="middle" font-family="Arial" font-size="36" fill="#4c1d95">G</text>
+  <text x="200" y="270" text-anchor="middle" font-family="Arial" font-size="22" fill="#4c1d95" font-weight="bold">Gauss</text>
+  <text x="200" y="300" text-anchor="middle" font-family="Arial" font-size="14" fill="#64748b">1777 – 1855</text>
+  <text x="200" y="330" text-anchor="middle" font-family="Arial" font-size="16" fill="#7c3aed">Σ(1..100)=5050</text>
+</svg>

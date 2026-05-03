@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#dcfce7"/>
+  <circle cx="200" cy="150" r="70" fill="#86efac"/>
+  <circle cx="200" cy="150" r="50" fill="#bbf7d0"/>
+  <text x="200" y="160" text-anchor="middle" font-family="Arial" font-size="36" fill="#166534">Ε</text>
+  <text x="200" y="270" text-anchor="middle" font-family="Arial" font-size="22" fill="#166534" font-weight="bold">Öklid</text>
+  <text x="200" y="300" text-anchor="middle" font-family="Arial" font-size="14" fill="#64748b">MÖ 325 – MÖ 265</text>
+  <text x="200" y="330" text-anchor="middle" font-family="Arial" font-size="16" fill="#16a34a">Elementler</text>
+</svg>

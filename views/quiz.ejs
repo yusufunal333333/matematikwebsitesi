@@ -1,0 +1,77 @@
+<%- include('partials/header') %>
+
+<h1 class="sayfa-baslik">Matematik Quiz</h1>
+<p style="text-align: center; margin-bottom: 2rem;">Matematik bilginizi 25 soruyla test edin! (12 buluş + 7 matematikçi + 6 genel matematik)</p>
+
+<div class="quiz-layout">
+  <div class="quiz-sol">
+    <form method="POST" action="/quiz" class="quiz-form">
+      <% sorular.forEach(function(s, i) { %>
+        <div class="soru-kutusu">
+          <h3><%= (i + 1) %>. <%= s.soru %></h3>
+          <ul class="secenekler">
+            <% s.secenekler.forEach(function(sec, j) { %>
+              <li>
+                <label>
+                  <input type="radio" name="soru_<%= s.index %>" value="<%= sec %>" required>
+                  <%= sec %>
+                </label>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+      <% }); %>
+      <button type="submit" class="quiz-gonder">Cevapları Gönder</button>
+    </form>
+  </div>
+
+  <div class="quiz-sag">
+    <div class="liderlik-tablosu">
+      <h3>🏆 En İyi 10</h3>
+      <% if (liderlik.length === 0) { %>
+        <p class="liderlik-bos">Henüz kimse quiz'i tamamlamadı. İlk sen ol!</p>
+      <% } else { %>
+        <ol class="liderlik-listesi">
+          <% liderlik.forEach(function(k, i) { %>
+            <li class="liderlik-satir <%= i === 0 ? 'lider-altin' : i === 1 ? 'lider-gumus' : i === 2 ? 'lider-bronz' : '' %>">
+              <span class="lider-sira"><%= i + 1 %>.</span>
+              <span class="lider-isim"><%= k.ad %> <%= k.soyad %></span>
+              <span class="lider-puan"><%= k.dogru %>/<%= k.toplam %></span>
+            </li>
+          <% }); %>
+        </ol>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelector('.quiz-form').addEventListener('submit', function(e) {
+  var sorular = document.querySelectorAll('.soru-kutusu');
+  var hepsiSecildi = true;
+  sorular.forEach(function(kutu) {
+    var radios = kutu.querySelectorAll('input[type="radio"]');
+    var secildi = false;
+    radios.forEach(function(r) { if (r.checked) secildi = true; });
+    if (!secildi) {
+      hepsiSecildi = false;
+      kutu.style.border = '2px solid #dc2626';
+      kutu.style.borderRadius = '8px';
+    } else {
+      kutu.style.border = '';
+    }
+  });
+  if (!hepsiSecildi) {
+    e.preventDefault();
+    alert('Lütfen tüm soruları cevaplayın.');
+    var ilk = document.querySelector('.soru-kutusu[style*="border"]');
+    if (ilk) ilk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+});
+// Remove required from radios to prevent browser default validation
+document.querySelectorAll('.quiz-form input[type="radio"]').forEach(function(r) {
+  r.removeAttribute('required');
+});
+</script>
+
+<%- include('partials/footer') %>

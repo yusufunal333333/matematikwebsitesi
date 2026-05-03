@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+<div style="margin-bottom: 1rem;">
+  <a href="/unlu-matematikciler">&larr; Tüm Matematikçiler</a>
+</div>
+
+<h1 class="sayfa-baslik"><%= matematikci.isim %></h1>
+
+<div class="detay-sayfa">
+  <div class="detay-resim">
+    <img src="/images/<%= matematikci.resim %>" alt="<%= matematikci.isim %>">
+  </div>
+  <div class="detay-icerik">
+    <div class="yasam"><%= matematikci.yasam %></div>
+    <div class="ulke-bilgi detay-ulke"><span class="bayrak-emoji"><%= matematikci.bayrak %></span> <%= matematikci.ulke %></div>
+    <div class="biyografi">
+      <% paragraflar.forEach(function(p) { %>
+        <p><%- p %></p>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

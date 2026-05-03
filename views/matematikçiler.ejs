@@ -1,0 +1,22 @@
+<%- include('partials/layout', { body: `
+<h1 class="sayfa-baslik">Ünlü Matematikçiler</h1>
+
+<p style="text-align: center; margin-bottom: 2rem;">Matematik tarihine yön veren ve keşifleriyle dünyayı değiştiren büyük matematikçileri tanıyın.</p>
+
+<div class="kart-grid">
+` + matematikçiler.map(m => `
+  <div class="kart">
+    <div class="kart-resim">
+      <img src="/images/${m.resim}" alt="${m.isim}">
+    </div>
+    <div class="kart-icerik">
+      <h3>${m.isim}</h3>
+      <div class="yasam">${m.yasam}</div>
+      <div class="ulke-bilgi"><span class="bayrak-emoji">${m.bayrak}</span> ${m.ulke}</div>
+      <p>${m.kisa}</p>
+      <a href="/matematikci/${m.id}">Biyografiyi Oku</a>
+    </div>
+  </div>
+`).join('') + `
+</div>
+` }) %>
