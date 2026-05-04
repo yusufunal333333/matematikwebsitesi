@@ -85,7 +85,7 @@ const quizSorulari = [
   {
     soru: "Hangi sayıyı 3 ile çarpıp 2 eklerseniz 11 elde edersiniz?",
     secenekler: ["2", "3", "4", "5"],
-    dogru: 2
+    dogru: 1
   },
   {
     soru: "Bir karenin alanı 64 cm² ise kenar uzunluğu kaç cm'dir?",
