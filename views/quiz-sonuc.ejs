@@ -2,6 +2,12 @@
 
 <h1 class="sayfa-baslik">Quiz Sonuçları</h1>
 
+<% if (kaydedildi && kaydedilenSonuc) { %>
+  <div class="icerik-kutusu" style="border-left: 4px solid #16a34a; background: #f0fdf4; margin-bottom: 1.5rem;">
+    <strong>Sonuç kaydedildi:</strong> <%= kaydedilenSonuc.ad %> <%= kaydedilenSonuc.soyad %> - <%= kaydedilenSonuc.dogru %>/<%= kaydedilenSonuc.toplam %>
+  </div>
+<% } %>
+
 <div class="quiz-layout">
   <div class="quiz-sol">
     <div class="sonuc-ozet">

@@ -359,6 +359,15 @@ app.get('/matematikci-olmak', (req, res) => {
 
 app.get('/quiz', (req, res) => {
   const liderlik = liderlikOku().sort((a, b) => b.dogru - a.dogru).slice(0, 10);
+  const kaydedildi = req.query.kaydedildi === '1';
+  const kaydedilenSonuc = kaydedildi
+    ? {
+        ad: req.query.ad || '',
+        soyad: req.query.soyad || '',
+        dogru: Number(req.query.dogru || 0),
+        toplam: Number(req.query.toplam || quizSorulari.length)
+      }
+    : null;
   // Shuffle answer options for each question
   const sorular = quizSorulari.map((s, index) => {
     const dogruCevap = s.secenekler[s.dogru];
@@ -371,7 +380,7 @@ app.get('/quiz', (req, res) => {
       dogru: yeniDogru
     };
   });
-  res.render('quiz', { sorular, aktifSayfa: 'quiz', liderlik });
+  res.render('quiz', { sorular, aktifSayfa: 'quiz', liderlik, kaydedildi, kaydedilenSonuc });
 });
 
 app.post('/quiz', (req, res) => {
@@ -399,7 +408,9 @@ app.post('/quiz', (req, res) => {
     dogru,
     toplam: quizSorulari.length,
     aktifSayfa: 'quiz',
-    liderlik
+    liderlik,
+    kaydedildi: false,
+    kaydedilenSonuc: null
   });
 });
 
@@ -416,7 +427,8 @@ app.post('/quiz-kaydet', (req, res) => {
     });
     liderlikYaz(liste);
   }
-  res.redirect('/quiz');
+  const yonlendirme = `/quiz?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
+  res.redirect(yonlendirme);
 });
 
 // 404 handler
