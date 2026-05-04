@@ -14,6 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL connection
+console.log('DATABASE_URL ayarlanmış mı?', process.env.DATABASE_URL ? 'EVET' : 'HAYIR (undefined/empty)');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -21,26 +22,32 @@ const pool = new Pool({
 
 // Create table if not exists
 async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS liderlik (
-      id SERIAL PRIMARY KEY,
-      ad VARCHAR(50) NOT NULL,
-      soyad VARCHAR(50) NOT NULL,
-      dogru INTEGER NOT NULL,
-      toplam INTEGER NOT NULL,
-      tarih VARCHAR(20) NOT NULL
-    )
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS liderlik (
+        id SERIAL PRIMARY KEY,
+        ad VARCHAR(50) NOT NULL,
+        soyad VARCHAR(50) NOT NULL,
+        dogru INTEGER NOT NULL,
+        toplam INTEGER NOT NULL,
+        tarih VARCHAR(20) NOT NULL
+      )
+    `);
+    console.log('✅ Liderlik tablosu başarılı - DB bağlantısı OK');
+  } catch (err) {
+    console.error('❌ DB init hatası:', err.message);
+  }
 }
-initDB().catch(err => console.error('DB init hatası:', err));
+initDB();
 
 // Leaderboard functions (PostgreSQL)
 async function liderlikOku() {
   try {
     const result = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC');
+    console.log(`✅ Liderlik okundu: ${result.rows.length} kayıt`);
     return result.rows;
   } catch (e) {
-    console.error('Liderlik okuma hatası:', e);
+    console.error('❌ Liderlik okuma hatası:', e.message);
     return [];
   }
 }
@@ -51,8 +58,9 @@ async function liderlikEkle(kayit) {
       'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ($1, $2, $3, $4, $5)',
       [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih]
     );
+    console.log(`✅ Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
   } catch (e) {
-    console.error('Liderlik yazma hatası:', e);
+    console.error('❌ Liderlik yazma hatası:', e.message);
   }
 }
 
