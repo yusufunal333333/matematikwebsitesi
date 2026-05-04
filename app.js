@@ -14,7 +14,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL connection
-console.log('DATABASE_URL ayarlanmış mı?', process.env.DATABASE_URL ? 'EVET' : 'HAYIR (undefined/empty)');
+if (!process.env.DATABASE_URL) {
+  console.error('⚠️ WARNING: DATABASE_URL is not set! Leaderboard will not work.');
+  console.error('   Please set DATABASE_URL in Render environment variables.');
+} else {
+  console.log('✅ DATABASE_URL is set:', process.env.DATABASE_URL.substring(0, 20) + '...');
+}
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -171,7 +176,7 @@ const quizSorulari = [
   {
     soru: "Euler hangi ülkede yaşamıştır?",
     secenekler: ["İtalya", "Rusya", "İsviçre", "Almanya"],
-    dogru: 1
+    dogru: 2
   },
   {
     soru: "El-Hârizmî'nin adından hangi kelime türemiştir?",
