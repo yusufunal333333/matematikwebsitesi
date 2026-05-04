@@ -88,14 +88,14 @@ const quizSorulari = [
     dogru: 2
   },
   {
-    soru: "Bir karesin alanı 64 cm² ise kenar uzunluğu kaç cm'dir?",
+    soru: "Bir karenin alanı 64 cm² ise kenar uzunluğu kaç cm'dir?",
     secenekler: ["6", "7", "8", "9"],
     dogru: 2
   },
   {
-    soru: "Pisagor Türkiye'de mi yoksa Antik Yunanistan'da mı yaşamıştır?",
-    secenekler: ["Türkiye", "Antik Yunanistan", "Mısır", "Babil"],
-    dogru: 1
+    soru: "Sisam Adası'nda doğan ünlü antik matematikçi kimdir?",
+    secenekler: ["Pisagor", "Öklid", "Arşimed", "Thales"],
+    dogru: 0
   },
   {
     soru: "85 ÷ 5 işleminin sonucu kaçtır?",
