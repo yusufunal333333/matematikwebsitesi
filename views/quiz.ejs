@@ -14,7 +14,7 @@
     <form method="POST" action="/quiz" class="quiz-form">
       <% sorular.forEach(function(s, i) { %>
         <div class="soru-kutusu">
-          <h3><%= (i + 1) %>. <%= s.soru %></h3>
+          <h3><%= s.soru %></h3>
           <ul class="secenekler">
             <% s.secenekler.forEach(function(sec, j) { %>
               <li>

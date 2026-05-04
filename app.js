@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,19 +13,47 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// Leaderboard data (stored in JSON file)
-const liderlikDosyasi = path.join(__dirname, 'liderlik.json');
-function liderlikOku() {
-  try {
-    if (fs.existsSync(liderlikDosyasi)) {
-      const veri = fs.readFileSync(liderlikDosyasi, 'utf8');
-      return JSON.parse(veri);
-    }
-  } catch (e) { /* ignore */ }
-  return [];
+// PostgreSQL connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+// Create table if not exists
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liderlik (
+      id SERIAL PRIMARY KEY,
+      ad VARCHAR(50) NOT NULL,
+      soyad VARCHAR(50) NOT NULL,
+      dogru INTEGER NOT NULL,
+      toplam INTEGER NOT NULL,
+      tarih VARCHAR(20) NOT NULL
+    )
+  `);
 }
-function liderlikYaz(liste) {
-  fs.writeFileSync(liderlikDosyasi, JSON.stringify(liste, null, 2), 'utf8');
+initDB().catch(err => console.error('DB init hatası:', err));
+
+// Leaderboard functions (PostgreSQL)
+async function liderlikOku() {
+  try {
+    const result = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC');
+    return result.rows;
+  } catch (e) {
+    console.error('Liderlik okuma hatası:', e);
+    return [];
+  }
+}
+
+async function liderlikEkle(kayit) {
+  try {
+    await pool.query(
+      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ($1, $2, $3, $4, $5)',
+      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih]
+    );
+  } catch (e) {
+    console.error('Liderlik yazma hatası:', e);
+  }
 }
 
 // Quiz data - 25 questions (12 discoveries, 7 about mathematicians, 6 general math)
@@ -155,16 +183,6 @@ const quizSorulari = [
   {
     soru: "Pisagor antik hangi uygarlığa ait bir matematikçidir?",
     secenekler: ["Mısır", "Mezopotamya", "Yunan", "Çin"],
-    dogru: 2
-  },
-  {
-    soru: "Fibonacci dizisinde 1, 1, 2, 3, 5'ten sonra gelen sayı kaçtır?",
-    secenekler: ["6", "7", "8", "9"],
-    dogru: 2
-  },
-  {
-    soru: "Aşağıdakilerden hangisi asal sayıdır?",
-    secenekler: ["9", "15", "13", "21"],
     dogru: 2
   }
 ];
@@ -357,8 +375,8 @@ app.get('/matematikci-olmak', (req, res) => {
   res.render('matematikci-olmak', { aktifSayfa: 'matematikci-olmak' });
 });
 
-app.get('/quiz', (req, res) => {
-  const liderlik = liderlikOku().sort((a, b) => b.dogru - a.dogru).slice(0, 10);
+app.get('/quiz', async (req, res) => {
+  const liderlik = (await liderlikOku()).slice(0, 10);
   const kaydedildi = req.query.kaydedildi === '1';
   const kaydedilenSonuc = kaydedildi
     ? {
@@ -383,7 +401,7 @@ app.get('/quiz', (req, res) => {
   res.render('quiz', { sorular, aktifSayfa: 'quiz', liderlik, kaydedildi, kaydedilenSonuc });
 });
 
-app.post('/quiz', (req, res) => {
+app.post('/quiz', async (req, res) => {
   const cevaplar = req.body;
   let dogru = 0;
   const sonuclar = quizSorulari.map((s, index) => {
@@ -401,7 +419,7 @@ app.post('/quiz', (req, res) => {
     };
   });
 
-  const liderlik = liderlikOku().sort((a, b) => b.dogru - a.dogru).slice(0, 10);
+  const liderlik = (await liderlikOku()).slice(0, 10);
 
   res.render('quiz-sonuc', {
     sonuclar,
@@ -414,18 +432,16 @@ app.post('/quiz', (req, res) => {
   });
 });
 
-app.post('/quiz-kaydet', (req, res) => {
+app.post('/quiz-kaydet', async (req, res) => {
   const { ad, soyad, dogru, toplam } = req.body;
   if (ad && soyad && dogru !== undefined && toplam !== undefined) {
-    const liste = liderlikOku();
-    liste.push({
+    await liderlikEkle({
       ad: ad.trim().substring(0, 50),
       soyad: soyad.trim().substring(0, 50),
       dogru: parseInt(dogru, 10),
       toplam: parseInt(toplam, 10),
       tarih: new Date().toLocaleDateString('tr-TR')
     });
-    liderlikYaz(liste);
   }
   const yonlendirme = `/quiz?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
   res.redirect(yonlendirme);
