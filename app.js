@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,58 +13,68 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// Leaderboard storage (In-Memory)
-let liderlikVerileri = [];
-const LIDERLIK_FILE = path.join(__dirname, 'liderlik.json');
-
-// Load leaderboard from JSON on startup
-function liderlikYukle() {
-  try {
-    if (fs.existsSync(LIDERLIK_FILE)) {
-      const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
-      liderlikVerileri = JSON.parse(data);
-      console.log(`✅ Liderlik dosyadan yüklendi: ${liderlikVerileri.length} kayıt`);
-    } else {
-      console.log('ℹ️ liderlik.json henüz boş, ilk kayıt eklendiğinde oluşturulacak');
-    }
-  } catch (e) {
-    console.error('⚠️ Liderlik yükleme hatası:', e.message);
-    liderlikVerileri = [];
+// SQLite Database Setup
+const DB_FILE = path.join(__dirname, 'liderlik.db');
+const db = new sqlite3.Database(DB_FILE, (err) => {
+  if (err) {
+    console.error('❌ Database bağlantı hatası:', err);
+  } else {
+    console.log('✅ SQLite database bağlantısı başarılı');
   }
-}
-liderlikYukle();
+});
 
-// Periyodik backup: Her 5 dakikada bir diskte bacak
-setInterval(() => {
-  try {
-    if (liderlikVerileri.length > 0) {
-      fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
-      console.log(`✅ [Auto Backup] Liderlik verileri kaydedildi (${liderlikVerileri.length} kayıt)`);
-    }
-  } catch (e) {
-    console.error('❌ [Auto Backup] Hata:', e.message);
+// Create table if not exists
+db.run(`
+  CREATE TABLE IF NOT EXISTS liderlik (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ad TEXT NOT NULL,
+    soyad TEXT NOT NULL,
+    dogru INTEGER NOT NULL,
+    toplam INTEGER NOT NULL,
+    tarih TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`, (err) => {
+  if (err) {
+    console.error('❌ Tablo oluşturma hatası:', err);
+  } else {
+    console.log('✅ Liderlik tablosu hazır');
   }
-}, 5 * 60 * 1000); // Her 5 dakika
+});
 
-// Leaderboard functions (In-Memory + JSON)
+// Leaderboard functions (SQLite)
 async function liderlikOku() {
-  // Sort by score (dogru) descending
-  const sorted = [...liderlikVerileri].sort((a, b) => b.dogru - a.dogru);
-  console.log(`✅ Liderlik okundu: ${sorted.length} kayıt`);
-  return sorted;
+  return new Promise((resolve) => {
+    db.all(
+      'SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC LIMIT 10',
+      (err, rows) => {
+        if (err) {
+          console.error('❌ Liderlik okuma hatası:', err);
+          resolve([]);
+        } else {
+          console.log(`✅ Liderlik okundu: ${rows.length} kayıt`);
+          resolve(rows);
+        }
+      }
+    );
+  });
 }
 
 async function liderlikEkle(kayit) {
-  try {
-    // Add to memory
-    liderlikVerileri.push(kayit);
-    
-    // Also save to JSON file (for persistence)
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
-    console.log(`✅ Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
-  } catch (e) {
-    console.error('❌ Liderlik yazma hatası:', e.message);
-  }
+  return new Promise((resolve) => {
+    db.run(
+      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES (?, ?, ?, ?, ?)',
+      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih],
+      function(err) {
+        if (err) {
+          console.error('❌ Liderlik yazma hatası:', err);
+        } else {
+          console.log(`✅ Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
+        }
+        resolve();
+      }
+    );
+  });
 }
 
 // Quiz data - 25 questions (12 discoveries, 7 about mathematicians, 6 general math)
@@ -467,25 +477,27 @@ app.listen(PORT, () => {
   console.log(`Matematik Dünyası http://localhost:${PORT} adresinde çalışıyor`);
 });
 
-// Graceful shutdown - app kapanırken verileri kaydet
+// Graceful shutdown - app kapanırken veritabanı kapat
 process.on('SIGTERM', () => {
   console.log('⚠️ SIGTERM alındı, uygulama kapatılıyor...');
-  try {
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
-    console.log('✅ Liderlik verileri kaydedildi');
-  } catch (e) {
-    console.error('❌ Veri kaydetme hatası:', e.message);
-  }
-  process.exit(0);
+  db.close((err) => {
+    if (err) {
+      console.error('❌ Database kapatma hatası:', err);
+    } else {
+      console.log('✅ Database kapatıldı');
+    }
+    process.exit(0);
+  });
 });
 
 process.on('SIGINT', () => {
   console.log('⚠️ SIGINT alındı, uygulama kapatılıyor...');
-  try {
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
-    console.log('✅ Liderlik verileri kaydedildi');
-  } catch (e) {
-    console.error('❌ Veri kaydetme hatası:', e.message);
-  }
-  process.exit(0);
+  db.close((err) => {
+    if (err) {
+      console.error('❌ Database kapatma hatası:', err);
+    } else {
+      console.log('✅ Database kapatıldı');
+    }
+    process.exit(0);
+  });
 });
