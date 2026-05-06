@@ -547,6 +547,20 @@ app.post('/quiz-kaydet', async (req, res) => {
   res.redirect(yonlendirme);
 });
 
+// Direct play route - NO CACHE ISSUES
+app.get('/oyna', async (req, res) => {
+  const sorular = kahootSorulari.map((s) => {
+    const karisikSecenekler = [...s.secenekler].sort(() => Math.random() - 0.5);
+    const yeniDogru = karisikSecenekler.indexOf(s.secenekler[s.dogru]);
+    return {
+      soru: s.soru,
+      secenekler: karisikSecenekler,
+      dogru: yeniDogru
+    };
+  });
+  res.render('kahoot-oyna', { sorular, aktifSayfa: 'oyna' });
+});
+
 // Kahoot Quiz Routes
 app.get('/kahoot', async (req, res) => {
   const kaydedildi = req.query.kaydedildi === '1';
