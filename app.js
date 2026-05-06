@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,68 +13,35 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// SQLite Database Setup
-const DB_FILE = path.join(__dirname, 'liderlik.db');
-const db = new sqlite3.Database(DB_FILE, (err) => {
-  if (err) {
-    console.error('❌ Database bağlantı hatası:', err);
-  } else {
-    console.log('✅ SQLite database bağlantısı başarılı');
-  }
-});
+// JSON File Leaderboard
+const LIDERLIK_FILE = path.join(__dirname, 'liderlik.json');
 
-// Create table if not exists
-db.run(`
-  CREATE TABLE IF NOT EXISTS liderlik (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ad TEXT NOT NULL,
-    soyad TEXT NOT NULL,
-    dogru INTEGER NOT NULL,
-    toplam INTEGER NOT NULL,
-    tarih TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`, (err) => {
-  if (err) {
-    console.error('❌ Tablo oluşturma hatası:', err);
-  } else {
-    console.log('✅ Liderlik tablosu hazır');
-  }
-});
-
-// Leaderboard functions (SQLite)
 async function liderlikOku() {
-  return new Promise((resolve) => {
-    db.all(
-      'SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC LIMIT 10',
-      (err, rows) => {
-        if (err) {
-          console.error('❌ Liderlik okuma hatası:', err);
-          resolve([]);
-        } else {
-          console.log(`✅ Liderlik okundu: ${rows.length} kayıt`);
-          resolve(rows);
-        }
-      }
-    );
-  });
+  try {
+    if (fs.existsSync(LIDERLIK_FILE)) {
+      const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
+      const list = JSON.parse(data);
+      return list.sort((a, b) => b.dogru - a.dogru);
+    }
+    return [];
+  } catch (e) {
+    console.error('Liderlik okuma hatası:', e.message);
+    return [];
+  }
 }
 
 async function liderlikEkle(kayit) {
-  return new Promise((resolve) => {
-    db.run(
-      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES (?, ?, ?, ?, ?)',
-      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih],
-      function(err) {
-        if (err) {
-          console.error('❌ Liderlik yazma hatası:', err);
-        } else {
-          console.log(`✅ Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
-        }
-        resolve();
-      }
-    );
-  });
+  try {
+    let list = [];
+    if (fs.existsSync(LIDERLIK_FILE)) {
+      list = JSON.parse(fs.readFileSync(LIDERLIK_FILE, 'utf8'));
+    }
+    list.push(kayit);
+    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(list, null, 2));
+    console.log(`Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
+  } catch (e) {
+    console.error('Liderlik yazma hatası:', e.message);
+  }
 }
 
 // Quiz data - 25 questions (12 discoveries, 7 about mathematicians, 6 general math)
@@ -635,19 +602,18 @@ app.post('/kahoot-kaydet', async (req, res) => {
 // Admin route - Liderlik kaydı sil
 app.get('/admin/sil/:ad/:soyad', (req, res) => {
   const { ad, soyad } = req.params;
-  db.run(
-    'DELETE FROM liderlik WHERE ad = ? AND soyad = ?',
-    [ad, soyad],
-    function(err) {
-      if (err) {
-        res.status(500).send('Hata: ' + err.message);
-        console.error('❌ Silme hatası:', err);
-      } else {
-        res.send(`✅ ${ad} ${soyad} liderlikten silindi (${this.changes} kayıt silinidi)`);
-        console.log(`✅ ${ad} ${soyad} silindi`);
-      }
+  try {
+    let list = [];
+    if (fs.existsSync(LIDERLIK_FILE)) {
+      list = JSON.parse(fs.readFileSync(LIDERLIK_FILE, 'utf8'));
     }
-  );
+    const onceki = list.length;
+    list = list.filter(k => !(k.ad === ad && k.soyad === soyad));
+    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(list, null, 2));
+    res.send(`${ad} ${soyad} liderlikten silindi (${onceki - list.length} kayıt)`);
+  } catch (e) {
+    res.status(500).send('Hata: ' + e.message);
+  }
 });
 
 // 404 handler
@@ -659,29 +625,4 @@ app.listen(PORT, () => {
   console.log(`Matematik Dünyası http://localhost:${PORT} adresinde çalışıyor`);
 });
 
-// Graceful shutdown - app kapanırken veritabanı kapat
-process.on('SIGTERM', () => {
-  console.log('⚠️ SIGTERM alındı, uygulama kapatılıyor...');
-  db.close((err) => {
-    if (err) {
-      console.error('❌ Database kapatma hatası:', err);
-    } else {
-      console.log('✅ Database kapatıldı');
-    }
-    process.exit(0);
-  });
-});
 
-process.on('SIGINT', () => {
-  console.log('⚠️ SIGINT alındı, uygulama kapatılıyor...');
-  db.close((err) => {
-    if (err) {
-      console.error('❌ Database kapatma hatası:', err);
-    } else {
-      console.log('✅ Database kapatıldı');
-    }
-    process.exit(0);
-  });
-});
-
-// Force redeploy Wed May  6 21:45:17 +03 2026
