@@ -50,19 +50,20 @@ img {
 header {
   background: linear-gradient(135deg, #1e3a5f, #2563eb);
   color: #fff;
-  padding: 0 2rem;
+  padding: 0 1rem;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  overflow: visible;
 }
 
 nav {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  height: 54px;
+  min-height: 54px;
   gap: 0.5rem;
   position: relative;
 }
