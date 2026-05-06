@@ -594,8 +594,16 @@ app.post('/kahoot-kaydet', async (req, res) => {
       tarih: new Date().toLocaleDateString('tr-TR')
     });
   }
-  const yonlendirme = `/kahoot?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || kahootSorulari.length)}`;
-  res.redirect(yonlendirme);
+  const liderlik = (await liderlikOku()).slice(0, 10);
+  res.render('kahoot-sonuc', {
+    sonuclar: [],
+    dogru: parseInt(dogru, 10) || 0,
+    toplam: parseInt(toplam, 10) || kahootSorulari.length,
+    aktifSayfa: 'kahoot',
+    liderlik,
+    kaydedildi: true,
+    kaydedilenSonuc: { ad: (ad || '').trim(), soyad: (soyad || '').trim(), dogru: parseInt(dogru, 10), toplam: parseInt(toplam, 10) }
+  });
 });
 
 
