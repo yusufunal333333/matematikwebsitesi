@@ -208,6 +208,85 @@ const quizSorulari = [
   }
 ];
 
+// Kahoot Quiz Data - 15 soruluk hızlı quiz
+const kahootSorulari = [
+  {
+    soru: "2 × 7 + 3 = ?",
+    secenekler: ["14", "17", "21", "13"],
+    dogru: 1
+  },
+  {
+    soru: "Bir üçgenin iç açıları toplamı kaç derecedir?",
+    secenekler: ["90°", "180°", "270°", "360°"],
+    dogru: 1
+  },
+  {
+    soru: "√64 kaçtır?",
+    secenekler: ["6", "7", "8", "9"],
+    dogru: 2
+  },
+  {
+    soru: "3x = 15 ise x kaçtır?",
+    secenekler: ["3", "5", "6", "12"],
+    dogru: 1
+  },
+  {
+    soru: "Bir dairenin yarıçapı 5 cm ise çevresi kaç cm'dir?",
+    secenekler: ["10π", "15π", "20π", "5π"],
+    dogru: 0
+  },
+  {
+    soru: "2³ (2 üzeri 3) kaçtır?",
+    secenekler: ["6", "8", "9", "12"],
+    dogru: 1
+  },
+  {
+    soru: "50 ÷ 5 = ?",
+    secenekler: ["8", "10", "12", "15"],
+    dogru: 1
+  },
+  {
+    soru: "Hangi sayı asal sayıdır?",
+    secenekler: ["1", "4", "6", "7"],
+    dogru: 3
+  },
+  {
+    soru: "Bir dikdörtgenin alanı = ?",
+    secenekler: ["a + b", "a × b", "2(a + b)", "a/b"],
+    dogru: 1
+  },
+  {
+    soru: "125 ÷ 5 = ?",
+    secenekler: ["20", "30", "25", "35"],
+    dogru: 2
+  },
+  {
+    soru: "x + 10 = 25 ise x = ?",
+    secenekler: ["10", "15", "25", "35"],
+    dogru: 1
+  },
+  {
+    soru: "Bir yılda kaç hafta vardır (yaklaşık)?",
+    secenekler: ["48", "50", "52", "54"],
+    dogru: 2
+  },
+  {
+    soru: "15% of 100 = ?",
+    secenekler: ["10", "15", "20", "25"],
+    dogru: 1
+  },
+  {
+    soru: "6² + 8² = ?",
+    secenekler: ["48", "50", "64", "100"],
+    dogru: 3
+  },
+  {
+    soru: "Pisagor Teoremi ne hakkındadır?",
+    secenekler: ["Daire", "Dik üçgen", "Kare", "Beşgen"],
+    dogru: 1
+  }
+];
+
 // Mathematician data
 const matematikçiler = [
   {
@@ -467,6 +546,77 @@ app.post('/quiz-kaydet', async (req, res) => {
   const yonlendirme = `/quiz?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
   res.redirect(yonlendirme);
 });
+
+// Kahoot Quiz Routes
+app.get('/kahoot', async (req, res) => {
+  const kaydedildi = req.query.kaydedildi === '1';
+  const kaydedilenSonuc = kaydedildi ? {
+    ad: req.query.ad,
+    soyad: req.query.soyad,
+    dogru: parseInt(req.query.dogru),
+    toplam: parseInt(req.query.toplam)
+  } : null;
+
+  const sorular = kahootSorulari.map((s) => {
+    const karisikSecenekler = [...s.secenekler].sort(() => Math.random() - 0.5);
+    const yeniDogru = karisikSecenekler.indexOf(s.secenekler[s.dogru]);
+    return {
+      soru: s.soru,
+      secenekler: karisikSecenekler,
+      dogru: yeniDogru
+    };
+  });
+
+  const liderlik = (await liderlikOku()).slice(0, 10);
+  res.render('kahoot', { sorular, aktifSayfa: 'kahoot', liderlik, kaydedildi, kaydedilenSonuc });
+});
+
+app.post('/kahoot', async (req, res) => {
+  const cevaplar = req.body;
+  let dogru = 0;
+  const sonuclar = kahootSorulari.map((s, index) => {
+    const kullaniciCevapText = cevaplar[`soru_${index}`];
+    const dogruCevapText = s.secenekler[s.dogru];
+    const dogruMu = kullaniciCevapText === dogruCevapText;
+    if (dogruMu) dogru++;
+    const kullaniciIndex = s.secenekler.indexOf(kullaniciCevapText);
+    return {
+      soru: s.soru,
+      secenekler: s.secenekler,
+      dogruIndex: s.dogru,
+      kullaniciIndex: kullaniciIndex,
+      dogruMu
+    };
+  });
+
+  const liderlik = (await liderlikOku()).slice(0, 10);
+
+  res.render('kahoot-sonuc', {
+    sonuclar,
+    dogru,
+    toplam: kahootSorulari.length,
+    aktifSayfa: 'kahoot',
+    liderlik,
+    kaydedildi: false,
+    kaydedilenSonuc: null
+  });
+});
+
+app.post('/kahoot-kaydet', async (req, res) => {
+  const { ad, soyad, dogru, toplam } = req.body;
+  if (ad && soyad && dogru !== undefined && toplam !== undefined) {
+    await liderlikEkle({
+      ad: ad.trim().substring(0, 50),
+      soyad: soyad.trim().substring(0, 50),
+      dogru: parseInt(dogru, 10),
+      toplam: parseInt(toplam, 10),
+      tarih: new Date().toLocaleDateString('tr-TR')
+    });
+  }
+  const yonlendirme = `/kahoot?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || kahootSorulari.length)}`;
+  res.redirect(yonlendirme);
+});
+
 
 // Admin route - Liderlik kaydı sil
 app.get('/admin/sil/:ad/:soyad', (req, res) => {
