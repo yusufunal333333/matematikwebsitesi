@@ -24,6 +24,8 @@ function liderlikYukle() {
       const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
       liderlikVerileri = JSON.parse(data);
       console.log(`✅ Liderlik dosyadan yüklendi: ${liderlikVerileri.length} kayıt`);
+    } else {
+      console.log('ℹ️ liderlik.json henüz boş, ilk kayıt eklendiğinde oluşturulacak');
     }
   } catch (e) {
     console.error('⚠️ Liderlik yükleme hatası:', e.message);
@@ -31,6 +33,18 @@ function liderlikYukle() {
   }
 }
 liderlikYukle();
+
+// Periyodik backup: Her 5 dakikada bir diskte bacak
+setInterval(() => {
+  try {
+    if (liderlikVerileri.length > 0) {
+      fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
+      console.log(`✅ [Auto Backup] Liderlik verileri kaydedildi (${liderlikVerileri.length} kayıt)`);
+    }
+  } catch (e) {
+    console.error('❌ [Auto Backup] Hata:', e.message);
+  }
+}, 5 * 60 * 1000); // Her 5 dakika
 
 // Leaderboard functions (In-Memory + JSON)
 async function liderlikOku() {
@@ -451,4 +465,27 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Matematik Dünyası http://localhost:${PORT} adresinde çalışıyor`);
+});
+
+// Graceful shutdown - app kapanırken verileri kaydet
+process.on('SIGTERM', () => {
+  console.log('⚠️ SIGTERM alındı, uygulama kapatılıyor...');
+  try {
+    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
+    console.log('✅ Liderlik verileri kaydedildi');
+  } catch (e) {
+    console.error('❌ Veri kaydetme hatası:', e.message);
+  }
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('⚠️ SIGINT alındı, uygulama kapatılıyor...');
+  try {
+    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
+    console.log('✅ Liderlik verileri kaydedildi');
+  } catch (e) {
+    console.error('❌ Veri kaydetme hatası:', e.message);
+  }
+  process.exit(0);
 });
