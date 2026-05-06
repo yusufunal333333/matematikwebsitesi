@@ -568,7 +568,7 @@ app.get('/kahoot', async (req, res) => {
   });
 
   const liderlik = (await liderlikOku()).slice(0, 10);
-  res.render('kahoot', { sorular, aktifSayfa: 'kahoot', liderlik, kaydedildi, kaydedilenSonuc });
+  res.render('kahoot-oyna', { sorular, aktifSayfa: 'kahoot', liderlik, kaydedildi, kaydedilenSonuc });
 });
 
 app.post('/kahoot', async (req, res) => {

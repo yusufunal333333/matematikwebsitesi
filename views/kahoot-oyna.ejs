@@ -1,0 +1,202 @@
+<%- include('partials/header') %>
+
+<style>
+  .kahoot-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .soru-box {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .soru-box.aktif {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .soru-baslik {
+    font-size: 1.8rem;
+    color: #1f2937;
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  .ilerleme {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .ilerleme-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    transition: width 0.3s;
+  }
+
+  .secenekler {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .secenek-btn {
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.2s;
+    color: white;
+  }
+
+  .secenek-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  }
+
+  .secenek-btn.kirmizi { background: #ef4444; }
+  .secenek-btn.yesil { background: #22c55e; }
+  .secenek-btn.mavi { background: #3b82f6; }
+  .secenek-btn.sari { background: #eab308; color: #333; }
+
+  .butonlar {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .btn-onceki { background: #6b7280; color: white; }
+  .btn-sonraki { background: #3b82f6; color: white; }
+  .btn-bitir { background: #22c55e; color: white; font-size: 1.1rem; }
+
+  .btn:hover { transform: translateY(-2px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .soru-no {
+    background: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+</style>
+
+<div class="kahoot-container">
+  <h1 style="text-align: center; color: #3b82f6; margin-bottom: 2rem;">⚡ Kahoot Quizi</h1>
+
+  <div class="ilerleme">
+    <div class="ilerleme-bar" id="ilerleme" style="width: 0%;"></div>
+  </div>
+
+  <form id="quizForm">
+    <% sorular.forEach((soru, index) => { %>
+      <div class="soru-box" id="soru_<%= index %>">
+        <div class="soru-no">Soru <%= index + 1 %> / <%= sorular.length %></div>
+        <h2 class="soru-baslik"><%= soru.soru %></h2>
+
+        <div class="secenekler">
+          <% soru.secenekler.forEach((secenek, idx) => { %>
+            <button type="button" class="secenek-btn <%= ['kirmizi', 'yesil', 'mavi', 'sari'][idx] %}" 
+              onclick="secenek<%= index %>_<%= idx %>()">
+              <%= secenek %>
+            </button>
+          <% }); %>
+        </div>
+
+        <div class="butonlar">
+          <% if (index > 0) { %>
+            <button type="button" class="btn btn-onceki" onclick="oncekiSoru(<%= index %>)">← Önceki</button>
+          <% } %>
+          <% if (index < sorular.length - 1) { %>
+            <button type="button" class="btn btn-sonraki" onclick="sonrakiSoru(<%= index %>)">Sonraki →</button>
+          <% } else { %>
+            <button type="submit" class="btn btn-bitir">✓ Sonuçları Gör</button>
+          <% } %>
+        </div>
+      </div>
+
+      <% soru.secenekler.forEach((secenek, idx) => { %>
+        <script>
+          function secenek<%= index %>_<%= idx %>() {
+            document.querySelectorAll('input[name="soru"]').forEach(el => el.remove());
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'soru_<%= index %>';
+            input.value = '<%= secenek %>';
+            document.getElementById('quizForm').appendChild(input);
+            
+            <% if (index < sorular.length - 1) { %>
+              sonrakiSoru(<%= index %>);
+            <% } else { %>
+              document.getElementById('quizForm').submit();
+            <% } %>
+          }
+        </script>
+      <% }); %>
+    <% }); %>
+  </form>
+</div>
+
+<script>
+  function sonrakiSoru(index) {
+    document.getElementById('soru_' + index).classList.remove('aktif');
+    document.getElementById('soru_' + (index + 1)).classList.add('aktif');
+    updatePileriski(index + 1);
+    window.scrollTo(0, 0);
+  }
+
+  function oncekiSoru(index) {
+    document.getElementById('soru_' + index).classList.remove('aktif');
+    document.getElementById('soru_' + (index - 1)).classList.add('aktif');
+    updatePileriski(index - 1);
+    window.scrollTo(0, 0);
+  }
+
+  function updatePileriski(current) {
+    const total = <%= sorular.length %>;
+    const percent = ((current + 1) / total) * 100;
+    document.getElementById('ilerleme').style.width = percent + '%';
+  }
+
+  // İlk soruyu göster
+  document.getElementById('soru_0').classList.add('aktif');
+  updatePileriski(0);
+
+  // Form submit
+  document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.method = 'POST';
+    this.action = '/kahoot';
+    this.submit();
+  });
+</script>
+
+<%- include('partials/footer') %>
