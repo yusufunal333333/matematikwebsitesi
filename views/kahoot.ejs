@@ -1,72 +1,77 @@
 <%- include('partials/header') %>
 
-<h1 class="sayfa-baslik">⚡ Hızlı Matematik Kahoot</h1>
+<div style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <h1 style="color: #2563eb; margin-bottom: 1rem;">⚡ Hızlı Matematik Kahoot</h1>
+  
+  <p style="font-size: 1.1rem; color: #666; margin-bottom: 1rem;">15 soruluk hızlı test ile kendini sına!</p>
+  
+  <form method="POST" action="/kahoot" id="kahootForm">
+    <% sorular.forEach((soru, index) => { %>
+      <div class="soru-container" id="soru_<%= index %>" style="display: <%= index === 0 ? 'block' : 'none' %>; padding: 2rem; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 2rem;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <span style="font-weight: bold; font-size: 1.2rem; color: #2563eb;">Soru <%= index + 1 %> / <%= sorular.length %></span>
+          <div style="width: 100px; height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden;">
+            <div style="width: <%= ((index + 1) / sorular.length) * 100 %>%; height: 100%; background: #2563eb; transition: width 0.3s;"></div>
+          </div>
+        </div>
 
-<div style="text-align: center; margin-bottom: 1rem;">
-  <p style="font-size: 1.1rem; color: #666;">15 soruluk hızlı test! Kendini kanıtla 🏆</p>
+        <h2 style="font-size: 1.4rem; margin-bottom: 2rem; color: #1f2937;"><%= soru.soru %></h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+          <% soru.secenekler.forEach((secenek, idx) => { %>
+            <label style="cursor: pointer;">
+              <input type="radio" name="soru_<%= index %>" value="<%= secenek %>" required style="display: none;">
+              <div style="padding: 1.5rem; border: 2px solid #e5e7eb; border-radius: 8px; background: <%= ['#ff6b6b', '#51cf66', '#339af0', '#ffd43b'][idx] %>; color: white; text-align: center; font-weight: bold; transition: all 0.2s; cursor: pointer;"
+                onMouseOver="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                onMouseOut="this.style.transform='scale(1)'; this.style.boxShadow='none'"
+              >
+                <%= secenek %>
+              </div>
+            </label>
+          <% }); %>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <% if (index > 0) { %>
+            <button type="button" onclick="oncekiSoru(<%= index %>)" style="flex: 1; padding: 1rem; background: #6c757d; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem;">← Önceki</button>
+          <% } %>
+          <% if (index < sorular.length - 1) { %>
+            <button type="button" onclick="sonrakiSoru(<%= index %>)" style="flex: 1; padding: 1rem; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem;">Sonraki →</button>
+          <% } else { %>
+            <button type="submit" style="flex: 1; padding: 1rem; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">✓ Bitir ve Sonuçları Gör</button>
+          <% } %>
+        </div>
+
+      </div>
+    <% }); %>
+  </form>
 </div>
-
-<form method="POST" action="/kahoot" id="kahootForm" style="max-width: 800px; margin: 0 auto;">
-  <% sorular.forEach((soru, index) => { %>
-    <div class="kahoot-soru" id="soru_<%= index %>" style="display: <%= index === 0 ? 'block' : 'none' %>; margin-bottom: 2rem; padding: 2rem; background: #f8f9fa; border-radius: 12px; border-left: 5px solid #2563eb;">
-      <div style="margin-bottom: 1rem;">
-        <span style="display: inline-block; background: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold;">Soru <%= index + 1 %> / <%= sorular.length %></span>
-      </div>
-      
-      <h2 style="margin: 1rem 0; color: #1e3a8a; font-size: 1.4rem;"><%= soru.soru %></h2>
-      
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0;">
-        <% soru.secenekler.forEach((secenek, idx) => { %>
-          <label style="cursor: pointer;">
-            <input type="radio" name="soru_<%= index %>" value="<%= secenek %>" required style="margin-right: 0.5rem;">
-            <span style="display: inline-block; background: <%= ['#ff6b6b', '#51cf66', '#339af0', '#ffd43b'][idx] %>; color: white; padding: 1rem; border-radius: 8px; width: 100%; text-align: center; font-weight: bold; transition: transform 0.2s; user-select: none;"
-              onMouseOver="this.style.transform='scale(1.05)'"
-              onMouseOut="this.style.transform='scale(1)'"
-            >
-              <%= secenek %>
-            </span>
-          </label>
-        <% }); %>
-      </div>
-      
-      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-        <% if (index > 0) { %>
-          <button type="button" onclick="oncekiSoru(<%= index %>)" style="flex: 1; padding: 0.75rem 1rem; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">← Önceki</button>
-        <% } %>
-        <% if (index < sorular.length - 1) { %>
-          <button type="button" onclick="sonrakiSoru(<%= index %>)" style="flex: 1; padding: 0.75rem 1rem; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Sonraki →</button>
-        <% } else { %>
-          <button type="submit" style="flex: 1; padding: 0.75rem 1rem; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.1rem;">✓ Bitir</button>
-        <% } %>
-      </div>
-    </div>
-  <% }); %>
-</form>
 
 <script>
   function sonrakiSoru(index) {
-    if (document.querySelector(`input[name="soru_${index}"]:checked`)) {
-      document.getElementById(`soru_${index}`).style.display = 'none';
-      document.getElementById(`soru_${index + 1}`).style.display = 'block';
-      window.scrollTo(0, 0);
-    } else {
+    const selected = document.querySelector('input[name="soru_' + index + '"]:checked');
+    if (!selected) {
       alert('Lütfen bir cevap seçin!');
+      return;
     }
-  }
-  
-  function oncekiSoru(index) {
-    document.getElementById(`soru_${index}`).style.display = 'none';
-    document.getElementById(`soru_${index - 1}`).style.display = 'block';
+    document.getElementById('soru_' + index).style.display = 'none';
+    document.getElementById('soru_' + (index + 1)).style.display = 'block';
     window.scrollTo(0, 0);
   }
   
-  // Form submit'ten önce tüm soruların cevaplanmış olduğunu kontrol et
+  function oncekiSoru(index) {
+    document.getElementById('soru_' + index).style.display = 'none';
+    document.getElementById('soru_' + (index - 1)).style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+  
   document.getElementById('kahootForm').addEventListener('submit', function(e) {
     const soruSayisi = <%= sorular.length %>;
     for (let i = 0; i < soruSayisi; i++) {
-      if (!document.querySelector(`input[name="soru_${i}"]:checked`)) {
+      if (!document.querySelector('input[name="soru_' + i + '"]:checked')) {
         e.preventDefault();
-        alert(`Lütfen ${i + 1}. soruyu cevaplayın!`);
+        alert('Lütfen tüm soruları cevaplayın!');
         return;
       }
     }
@@ -74,3 +79,4 @@
 </script>
 
 <%- include('partials/footer') %>
+
