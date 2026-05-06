@@ -468,6 +468,24 @@ app.post('/quiz-kaydet', async (req, res) => {
   res.redirect(yonlendirme);
 });
 
+// Admin route - Liderlik kaydı sil
+app.get('/admin/sil/:ad/:soyad', (req, res) => {
+  const { ad, soyad } = req.params;
+  db.run(
+    'DELETE FROM liderlik WHERE ad = ? AND soyad = ?',
+    [ad, soyad],
+    function(err) {
+      if (err) {
+        res.status(500).send('Hata: ' + err.message);
+        console.error('❌ Silme hatası:', err);
+      } else {
+        res.send(`✅ ${ad} ${soyad} liderlikten silindi (${this.changes} kayıt silinidi)`);
+        console.log(`✅ ${ad} ${soyad} silindi`);
+      }
+    }
+  );
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).render('404', { aktifSayfa: '' });
