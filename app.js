@@ -13,31 +13,40 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// Leaderboard storage (JSON File)
+// Leaderboard storage (In-Memory)
+let liderlikVerileri = [];
 const LIDERLIK_FILE = path.join(__dirname, 'liderlik.json');
 
-// Leaderboard functions (JSON File)
-async function liderlikOku() {
+// Load leaderboard from JSON on startup
+function liderlikYukle() {
   try {
-    const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
-    const liderlik = JSON.parse(data);
-    console.log(`✅ Liderlik okundu: ${liderlik.length} kayıt`);
-    return liderlik.sort((a, b) => b.dogru - a.dogru);
+    if (fs.existsSync(LIDERLIK_FILE)) {
+      const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
+      liderlikVerileri = JSON.parse(data);
+      console.log(`✅ Liderlik dosyadan yüklendi: ${liderlikVerileri.length} kayıt`);
+    }
   } catch (e) {
-    console.error('❌ Liderlik okuma hatası:', e.message);
-    return [];
+    console.error('⚠️ Liderlik yükleme hatası:', e.message);
+    liderlikVerileri = [];
   }
+}
+liderlikYukle();
+
+// Leaderboard functions (In-Memory + JSON)
+async function liderlikOku() {
+  // Sort by score (dogru) descending
+  const sorted = [...liderlikVerileri].sort((a, b) => b.dogru - a.dogru);
+  console.log(`✅ Liderlik okundu: ${sorted.length} kayıt`);
+  return sorted;
 }
 
 async function liderlikEkle(kayit) {
   try {
-    let liderlik = [];
-    if (fs.existsSync(LIDERLIK_FILE)) {
-      const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
-      liderlik = JSON.parse(data);
-    }
-    liderlik.push(kayit);
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlik, null, 2));
+    // Add to memory
+    liderlikVerileri.push(kayit);
+    
+    // Also save to JSON file (for persistence)
+    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(liderlikVerileri, null, 2));
     console.log(`✅ Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
   } catch (e) {
     console.error('❌ Liderlik yazma hatası:', e.message);
