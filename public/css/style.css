@@ -126,35 +126,22 @@ nav {
   text-decoration: none;
 }
 
-/* Nav links - hidden by default, shown on hamburger click */
+/* Nav links - visible horizontally on desktop */
 .nav-links {
   list-style: none;
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  padding: 0;
-  z-index: 150;
-  gap: 0;
-}
-
-.nav-links.acik {
   display: flex;
-}
-
-.nav-links li {
-  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-links li a {
   color: #fff;
-  padding: 12px 1.5rem;
-  border-radius: 0;
-  font-size: 10pt;
+  padding: 6px 9px;
+  border-radius: 4px;
+  font-size: 9pt;
   display: block;
   text-decoration: none;
   transition: background 0.2s;
@@ -172,58 +159,9 @@ nav {
   font-weight: bold;
 }
 
-.nav-links a {
-  color: #fff;
-  font-size: 10pt;
-  padding: 8px 12px;
-  transition: background 0.2s, color 0.2s;
-  display: block;
-  text-decoration: none;
-  border-radius: 4px;
-}
-
-.nav-links a:hover {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  text-decoration: none;
-}
-
-.nav-links a.aktif {
-  color: #fbbf24;
-  background: rgba(255,255,255,0.1);
-  font-weight: bold;
-}
-
-/* Nav direkt - always visible Quiz & Kahoot */
+/* Nav direkt - hidden on desktop (links already in nav-links), shown on mobile */
 .nav-direkt {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.nav-direkt a {
-  color: #fff;
-  background: rgba(255,255,255,0.15);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 10pt;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.2s, transform 0.2s;
-  white-space: nowrap;
-}
-
-.nav-direkt a:hover {
-  background: rgba(255,255,255,0.3);
-  transform: scale(1.05);
-  text-decoration: none;
-}
-
-.nav-direkt a.aktif {
-  background: #fbbf24;
-  color: #1e3a5f;
+  display: none;
 }
 
 /* Main */
@@ -703,9 +641,32 @@ footer {
     display: flex;
   }
 
-  .nav-links a {
+  .nav-links li a {
     font-size: 10pt;
     padding: 0.8rem 1.2rem;
+    border-radius: 0;
+  }
+
+  .nav-direkt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .nav-direkt a {
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 9pt;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nav-direkt a.aktif {
+    background: #fbbf24;
+    color: #1e3a5f;
   }
 
   main {
