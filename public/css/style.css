@@ -137,6 +137,27 @@ nav {
   padding: 0;
 }
 
+/* When hamburger is clicked on desktop, show as dropdown */
+.nav-links.acik {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  padding: 0.5rem 0;
+  z-index: 150;
+  gap: 0;
+}
+
+.nav-links.acik li a {
+  padding: 12px 1.5rem;
+  border-radius: 0;
+  font-size: 10pt;
+}
+
 .nav-links li a {
   color: #fff;
   padding: 6px 9px;
