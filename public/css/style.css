@@ -68,9 +68,9 @@ nav {
   position: relative;
 }
 
-/* Hamburger button - hidden on desktop, visible on mobile */
+/* Hamburger button - always visible */
 .hamburger {
-  display: none;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 5px;
@@ -126,28 +126,38 @@ nav {
   text-decoration: none;
 }
 
-/* Nav links - desktop: inline, mobile: dropdown */
+/* Nav links - hidden by default, shown on hamburger click */
 .nav-links {
   list-style: none;
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  padding: 0;
+  z-index: 150;
+  gap: 0;
+}
+
+.nav-links.acik {
   display: flex;
-  flex-direction: row;
-  gap: 0.25rem;
-  flex-grow: 1;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .nav-links li {
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .nav-links li a {
   color: #fff;
-  padding: 6px 8px;
-  border-radius: 4px;
-  transition: background 0.2s;
+  padding: 12px 1.5rem;
+  border-radius: 0;
+  font-size: 10pt;
   display: block;
-  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background 0.2s;
   white-space: nowrap;
 }
 
@@ -156,54 +166,10 @@ nav {
   text-decoration: none;
 }
 
-/* Mobile responsive - hamburger menu */
-@media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-  }
-
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #1e3a5f, #1e4a7f);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    padding: 0;
-    z-index: 150;
-    gap: 0;
-  }
-
-  .nav-links.acik {
-    display: flex;
-  }
-
-  .nav-links li {
-    width: 100%;
-  }
-
-  .nav-links li a {
-    color: #fff;
-    padding: 12px 1.5rem;
-    border-radius: 0;
-    font-size: 10pt;
-    display: block;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-
-  .nav-links li a:hover {
-    background: rgba(255,255,255,0.15);
-    text-decoration: none;
-  }
-
-  .nav-links li a.aktif {
-    color: #fbbf24;
-    background: rgba(255,255,255,0.1);
-    font-weight: bold;
-  }
+.nav-links li a.aktif {
+  color: #fbbf24;
+  background: rgba(255,255,255,0.1);
+  font-weight: bold;
 }
 
 .nav-links a {
@@ -226,6 +192,38 @@ nav {
   color: #fbbf24;
   background: rgba(255,255,255,0.1);
   font-weight: bold;
+}
+
+/* Nav direkt - always visible Quiz & Kahoot */
+.nav-direkt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-direkt a {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 10pt;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.nav-direkt a:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.05);
+  text-decoration: none;
+}
+
+.nav-direkt a.aktif {
+  background: #fbbf24;
+  color: #1e3a5f;
 }
 
 /* Main */
