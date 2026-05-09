@@ -680,10 +680,6 @@ app.get('/db-test', async (req, res) => {
   }
   res.json(info);
 });
-    info.hata = e.message;
-  }
-  res.json(info);
-});
 
 // 404 handler
 app.use((req, res) => {
