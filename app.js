@@ -41,9 +41,11 @@ async function tabloOlustur() {
         tarih VARCHAR(20) NOT NULL
       )
     `);
-    console.log('Liderlik tablosu hazır');
+    const count = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
+    console.log('Liderlik tablosu hazır - mevcut kayıt sayısı:', count.rows[0].sayi);
   } catch (e) {
     console.error('Tablo oluşturma hatası:', e.message);
+    console.error('DATABASE_URL:', process.env.DATABASE_URL ? 'ayarlı (' + process.env.DATABASE_URL.substring(0, 25) + '...)' : 'YOK');
   }
 }
 tabloOlustur();
