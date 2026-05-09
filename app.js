@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,17 +13,36 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// JSON File Leaderboard
-const LIDERLIK_FILE = path.join(__dirname, 'liderlik.json');
+// PostgreSQL bağlantısı
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+// Tablo oluştur (uygulama başladığında)
+async function tabloOlustur() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS liderlik (
+        id SERIAL PRIMARY KEY,
+        ad VARCHAR(50) NOT NULL,
+        soyad VARCHAR(50) NOT NULL,
+        dogru INTEGER NOT NULL,
+        toplam INTEGER NOT NULL,
+        tarih VARCHAR(20) NOT NULL
+      )
+    `);
+    console.log('Liderlik tablosu hazır');
+  } catch (e) {
+    console.error('Tablo oluşturma hatası:', e.message);
+  }
+}
+tabloOlustur();
 
 async function liderlikOku() {
   try {
-    if (fs.existsSync(LIDERLIK_FILE)) {
-      const data = fs.readFileSync(LIDERLIK_FILE, 'utf8');
-      const list = JSON.parse(data);
-      return list.sort((a, b) => b.dogru - a.dogru);
-    }
-    return [];
+    const result = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC');
+    return result.rows;
   } catch (e) {
     console.error('Liderlik okuma hatası:', e.message);
     return [];
@@ -32,12 +51,10 @@ async function liderlikOku() {
 
 async function liderlikEkle(kayit) {
   try {
-    let list = [];
-    if (fs.existsSync(LIDERLIK_FILE)) {
-      list = JSON.parse(fs.readFileSync(LIDERLIK_FILE, 'utf8'));
-    }
-    list.push(kayit);
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(list, null, 2));
+    await pool.query(
+      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ($1, $2, $3, $4, $5)',
+      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih]
+    );
     console.log(`Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
   } catch (e) {
     console.error('Liderlik yazma hatası:', e.message);
@@ -608,17 +625,14 @@ app.post('/kahoot-kaydet', async (req, res) => {
 
 
 // Admin route - Liderlik kaydı sil
-app.get('/admin/sil/:ad/:soyad', (req, res) => {
+app.get('/admin/sil/:ad/:soyad', async (req, res) => {
   const { ad, soyad } = req.params;
   try {
-    let list = [];
-    if (fs.existsSync(LIDERLIK_FILE)) {
-      list = JSON.parse(fs.readFileSync(LIDERLIK_FILE, 'utf8'));
-    }
-    const onceki = list.length;
-    list = list.filter(k => !(k.ad === ad && k.soyad === soyad));
-    fs.writeFileSync(LIDERLIK_FILE, JSON.stringify(list, null, 2));
-    res.send(`${ad} ${soyad} liderlikten silindi (${onceki - list.length} kayıt)`);
+    const result = await pool.query(
+      'DELETE FROM liderlik WHERE ad = $1 AND soyad = $2',
+      [ad, soyad]
+    );
+    res.send(`${ad} ${soyad} liderlikten silindi (${result.rowCount} kayıt)`);
   } catch (e) {
     res.status(500).send('Hata: ' + e.message);
   }
