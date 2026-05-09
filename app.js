@@ -65,8 +65,10 @@ async function liderlikEkle(kayit) {
       [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih]
     );
     console.log(`Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
+    return true;
   } catch (e) {
     console.error('Liderlik yazma hatası:', e.message);
+    return false;
   }
 }
 
@@ -527,8 +529,9 @@ app.post('/quiz', async (req, res) => {
 
 app.post('/quiz-kaydet', async (req, res) => {
   const { ad, soyad, dogru, toplam } = req.body;
+  let basarili = false;
   if (ad && soyad && dogru !== undefined && toplam !== undefined) {
-    await liderlikEkle({
+    basarili = await liderlikEkle({
       ad: ad.trim().substring(0, 50),
       soyad: soyad.trim().substring(0, 50),
       dogru: parseInt(dogru, 10),
@@ -536,7 +539,7 @@ app.post('/quiz-kaydet', async (req, res) => {
       tarih: new Date().toLocaleDateString('tr-TR')
     });
   }
-  const yonlendirme = `/quiz?kaydedildi=1&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
+  const yonlendirme = `/quiz?kaydedildi=${basarili ? '1' : '0'}&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
   res.redirect(yonlendirme);
 });
 
@@ -611,8 +614,9 @@ app.post('/kahoot', async (req, res) => {
 
 app.post('/kahoot-kaydet', async (req, res) => {
   const { ad, soyad, dogru, toplam } = req.body;
+  let basarili = false;
   if (ad && soyad && dogru !== undefined && toplam !== undefined) {
-    await liderlikEkle({
+    basarili = await liderlikEkle({
       ad: ad.trim().substring(0, 50),
       soyad: soyad.trim().substring(0, 50),
       dogru: parseInt(dogru, 10),
@@ -627,8 +631,8 @@ app.post('/kahoot-kaydet', async (req, res) => {
     toplam: parseInt(toplam, 10) || kahootSorulari.length,
     aktifSayfa: 'kahoot',
     liderlik,
-    kaydedildi: true,
-    kaydedilenSonuc: { ad: (ad || '').trim(), soyad: (soyad || '').trim(), dogru: parseInt(dogru, 10), toplam: parseInt(toplam, 10) }
+    kaydedildi: basarili,
+    kaydedilenSonuc: basarili ? { ad: (ad || '').trim(), soyad: (soyad || '').trim(), dogru: parseInt(dogru, 10), toplam: parseInt(toplam, 10) } : null
   });
 });
 
@@ -649,15 +653,31 @@ app.get('/admin/sil/:ad/:soyad', async (req, res) => {
 
 // Tanılama endpoint - veritabanı bağlantısını test et
 app.get('/db-test', async (req, res) => {
-  const info = { DATABASE_URL_SET: !!process.env.DATABASE_URL };
+  const dbUrl = process.env.DATABASE_URL || '';
+  const info = {
+    DATABASE_URL_SET: !!process.env.DATABASE_URL,
+    URL_BASLANGIÇ: dbUrl ? dbUrl.substring(0, 30) + '...' : 'YOK',
+    URL_UZUNLUK: dbUrl.length
+  };
   try {
-    const result = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
+    const testConn = await pool.query('SELECT NOW() as zaman');
     info.baglanti = 'OK';
+    info.sunucu_zamani = testConn.rows[0].zaman;
+    const result = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
     info.kayit_sayisi = result.rows[0].sayi;
     const rows = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC LIMIT 10');
     info.son_kayitlar = rows.rows;
+    // Test insert + delete
+    await pool.query("INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ('TEST', 'TEST', 0, 0, 'test')");
+    await pool.query("DELETE FROM liderlik WHERE ad = 'TEST' AND soyad = 'TEST'");
+    info.yazma_testi = 'OK';
   } catch (e) {
     info.baglanti = 'HATA';
+    info.hata = e.message;
+    info.hata_detay = e.code || 'bilinmeyen';
+  }
+  res.json(info);
+});
     info.hata = e.message;
   }
   res.json(info);
