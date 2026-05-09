@@ -49,22 +49,8 @@ async function tabloOlustur() {
       ADD COLUMN IF NOT EXISTS quiz_type VARCHAR(20) DEFAULT 'quiz'
     `);
     
-    // Eski verileri toplam soru sayısına göre ayır
-    await pool.query(`
-      UPDATE liderlik SET quiz_type = 'kahoot' 
-      WHERE toplam = 15 AND (quiz_type IS NULL OR quiz_type = '')
-    `);
-    
-    await pool.query(`
-      UPDATE liderlik SET quiz_type = 'quiz' 
-      WHERE toplam = 25 AND (quiz_type IS NULL OR quiz_type = '')
-    `);
-    
-    // Henüz ayırılmamış verileri 'quiz' olarak set et
-    await pool.query(`
-      UPDATE liderlik SET quiz_type = 'quiz' 
-      WHERE quiz_type IS NULL OR quiz_type = ''
-    `);
+    // Tüm eski verileri sil - sıfırdan başla
+    await pool.query(`DELETE FROM liderlik`);
     
     const count = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
     console.log('Liderlik tablosu hazır - mevcut kayıt sayısı:', count.rows[0].sayi);

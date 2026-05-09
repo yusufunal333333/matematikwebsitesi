@@ -76,4 +76,38 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+  // Konfeti animasyonu başlat
+  function konfetiYagdir() {
+    const duration = 3000; // 3 saniye
+    const animationEnd = Date.now() + duration;
+    
+    function seeDot() {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return;
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { x: Math.random(), y: Math.random() - 0.2 }
+      });
+      
+      requestAnimationFrame(seeDot);
+    }
+    
+    seeDot();
+  }
+  
+  // Sayfa yüklendiğinde konfeti başlat
+  window.addEventListener('load', function() {
+    setTimeout(konfetiYagdir, 500); // 0.5 saniye gecikme
+  });
+  
+  // Veya hemen başlat
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(konfetiYagdir, 500);
+  }
+</script>
+
 <%- include('partials/footer') %>
