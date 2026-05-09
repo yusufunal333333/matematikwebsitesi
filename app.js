@@ -38,7 +38,8 @@ async function tabloOlustur() {
         soyad VARCHAR(50) NOT NULL,
         dogru INTEGER NOT NULL,
         toplam INTEGER NOT NULL,
-        tarih VARCHAR(20) NOT NULL
+        tarih VARCHAR(20) NOT NULL,
+        quiz_type VARCHAR(20) DEFAULT 'quiz'
       )
     `);
     const count = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
@@ -50,9 +51,12 @@ async function tabloOlustur() {
 }
 tabloOlustur();
 
-async function liderlikOku() {
+async function liderlikOku(quizType = 'quiz') {
   try {
-    const result = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC');
+    const result = await pool.query(
+      'SELECT ad, soyad, dogru, toplam, tarih FROM liderlik WHERE quiz_type = $1 ORDER BY dogru DESC',
+      [quizType]
+    );
     return result.rows;
   } catch (e) {
     console.error('Liderlik okuma hatası:', e.message);
@@ -60,13 +64,13 @@ async function liderlikOku() {
   }
 }
 
-async function liderlikEkle(kayit) {
+async function liderlikEkle(kayit, quizType = 'quiz') {
   try {
     await pool.query(
-      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ($1, $2, $3, $4, $5)',
-      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih]
+      'INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih, quiz_type) VALUES ($1, $2, $3, $4, $5, $6)',
+      [kayit.ad, kayit.soyad, kayit.dogru, kayit.toplam, kayit.tarih, quizType]
     );
-    console.log(`Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam})`);
+    console.log(`Liderlik eklendi: ${kayit.ad} ${kayit.soyad} (${kayit.dogru}/${kayit.toplam}) - ${quizType}`);
     return true;
   } catch (e) {
     console.error('Liderlik yazma hatası:', e.message);
@@ -473,7 +477,7 @@ app.get('/matematikci-olmak', (req, res) => {
 });
 
 app.get('/quiz', async (req, res) => {
-  const liderlik = (await liderlikOku()).slice(0, 10);
+  const liderlik = (await liderlikOku('quiz')).slice(0, 10);
   const kaydedildi = req.query.kaydedildi === '1';
   const kaydedilenSonuc = kaydedildi
     ? {
@@ -516,7 +520,7 @@ app.post('/quiz', async (req, res) => {
     };
   });
 
-  const liderlik = (await liderlikOku()).slice(0, 10);
+  const liderlik = (await liderlikOku('quiz')).slice(0, 10);
 
   res.render('quiz-sonuc', {
     sonuclar,
@@ -539,7 +543,7 @@ app.post('/quiz-kaydet', async (req, res) => {
       dogru: parseInt(dogru, 10),
       toplam: parseInt(toplam, 10),
       tarih: new Date().toLocaleDateString('tr-TR')
-    });
+    }, 'quiz');
   }
   const yonlendirme = `/quiz?kaydedildi=${basarili ? '1' : '0'}&ad=${encodeURIComponent((ad || '').trim().substring(0, 50))}&soyad=${encodeURIComponent((soyad || '').trim().substring(0, 50))}&dogru=${encodeURIComponent(dogru || 0)}&toplam=${encodeURIComponent(toplam || quizSorulari.length)}`;
   res.redirect(yonlendirme);
@@ -579,7 +583,7 @@ app.get('/kahoot', async (req, res) => {
     };
   });
 
-  const liderlik = (await liderlikOku()).slice(0, 10);
+  const liderlik = (await liderlikOku('kahoot')).slice(0, 10);
   res.render('kahoot-oyna', { sorular, aktifSayfa: 'kahoot', liderlik, kaydedildi, kaydedilenSonuc });
 });
 
@@ -601,7 +605,7 @@ app.post('/kahoot', async (req, res) => {
     };
   });
 
-  const liderlik = (await liderlikOku()).slice(0, 10);
+  const liderlik = (await liderlikOku('kahoot')).slice(0, 10);
 
   res.render('kahoot-sonuc', {
     sonuclar,
@@ -624,9 +628,9 @@ app.post('/kahoot-kaydet', async (req, res) => {
       dogru: parseInt(dogru, 10),
       toplam: parseInt(toplam, 10),
       tarih: new Date().toLocaleDateString('tr-TR')
-    });
+    }, 'kahoot');
   }
-  const liderlik = (await liderlikOku()).slice(0, 10);
+  const liderlik = (await liderlikOku('kahoot')).slice(0, 10);
   res.render('kahoot-sonuc', {
     sonuclar: [],
     dogru: parseInt(dogru, 10) || 0,
