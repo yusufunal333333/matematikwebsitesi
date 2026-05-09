@@ -43,6 +43,12 @@ async function tabloOlustur() {
       )
     `);
     
+    // Var olan tablolara quiz_type kolonu ekle (eğer yoksa)
+    await pool.query(`
+      ALTER TABLE liderlik 
+      ADD COLUMN IF NOT EXISTS quiz_type VARCHAR(20) DEFAULT 'quiz'
+    `);
+    
     // Eski verilerin quiz_type'ını 'quiz' olarak set et
     await pool.query(`
       UPDATE liderlik SET quiz_type = 'quiz' 
