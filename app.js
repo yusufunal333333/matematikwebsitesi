@@ -678,10 +678,10 @@ app.get('/db-test', async (req, res) => {
     info.sunucu_zamani = testConn.rows[0].zaman;
     const result = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
     info.kayit_sayisi = result.rows[0].sayi;
-    const rows = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC LIMIT 10');
+    const rows = await pool.query('SELECT ad, soyad, dogru, toplam, tarih, quiz_type FROM liderlik ORDER BY dogru DESC LIMIT 10');
     info.son_kayitlar = rows.rows;
     // Test insert + delete
-    await pool.query("INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih) VALUES ('TEST', 'TEST', 0, 0, 'test')");
+    await pool.query("INSERT INTO liderlik (ad, soyad, dogru, toplam, tarih, quiz_type) VALUES ('TEST', 'TEST', 0, 0, 'test', 'test')");
     await pool.query("DELETE FROM liderlik WHERE ad = 'TEST' AND soyad = 'TEST'");
     info.yazma_testi = 'OK';
   } catch (e) {
