@@ -14,9 +14,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL bağlantısı
+if (!process.env.DATABASE_URL) {
+  console.error('UYARI: DATABASE_URL environment variable ayarlanmamış!');
+}
+console.log('DATABASE_URL var mı:', !!process.env.DATABASE_URL);
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
+
+pool.on('error', (err) => {
+  console.error('PostgreSQL pool hatası:', err.message);
 });
 
 // Tablo oluştur (uygulama başladığında)
@@ -636,6 +645,22 @@ app.get('/admin/sil/:ad/:soyad', async (req, res) => {
   } catch (e) {
     res.status(500).send('Hata: ' + e.message);
   }
+});
+
+// Tanılama endpoint - veritabanı bağlantısını test et
+app.get('/db-test', async (req, res) => {
+  const info = { DATABASE_URL_SET: !!process.env.DATABASE_URL };
+  try {
+    const result = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
+    info.baglanti = 'OK';
+    info.kayit_sayisi = result.rows[0].sayi;
+    const rows = await pool.query('SELECT ad, soyad, dogru, toplam, tarih FROM liderlik ORDER BY dogru DESC LIMIT 10');
+    info.son_kayitlar = rows.rows;
+  } catch (e) {
+    info.baglanti = 'HATA';
+    info.hata = e.message;
+  }
+  res.json(info);
 });
 
 // 404 handler
