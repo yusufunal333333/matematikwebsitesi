@@ -49,7 +49,18 @@ async function tabloOlustur() {
       ADD COLUMN IF NOT EXISTS quiz_type VARCHAR(20) DEFAULT 'quiz'
     `);
     
-    // Eski verilerin quiz_type'ını 'quiz' olarak set et
+    // Eski verileri toplam soru sayısına göre ayır
+    await pool.query(`
+      UPDATE liderlik SET quiz_type = 'kahoot' 
+      WHERE toplam = 15 AND (quiz_type IS NULL OR quiz_type = '')
+    `);
+    
+    await pool.query(`
+      UPDATE liderlik SET quiz_type = 'quiz' 
+      WHERE toplam = 25 AND (quiz_type IS NULL OR quiz_type = '')
+    `);
+    
+    // Henüz ayırılmamış verileri 'quiz' olarak set et
     await pool.query(`
       UPDATE liderlik SET quiz_type = 'quiz' 
       WHERE quiz_type IS NULL OR quiz_type = ''
