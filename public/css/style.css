@@ -153,6 +153,12 @@ nav {
   padding: 0.5rem 0;
   z-index: 150;
   gap: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.nav-links.acik li {
+  width: 100%;
 }
 
 .nav-links.acik li a {

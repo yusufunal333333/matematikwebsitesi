@@ -42,6 +42,13 @@ async function tabloOlustur() {
         quiz_type VARCHAR(20) DEFAULT 'quiz'
       )
     `);
+    
+    // Eski verilerin quiz_type'ını 'quiz' olarak set et
+    await pool.query(`
+      UPDATE liderlik SET quiz_type = 'quiz' 
+      WHERE quiz_type IS NULL OR quiz_type = ''
+    `);
+    
     const count = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
     console.log('Liderlik tablosu hazır - mevcut kayıt sayısı:', count.rows[0].sayi);
   } catch (e) {
