@@ -17,6 +17,7 @@
     </div>
 
     <!-- Sonuç Kaydetme Formu -->
+    <% if (!kaydedildi) { %>
     <div class="kaydet-formu">
       <h3>📝 Sonucunuzu Kaydedin</h3>
       <form method="POST" action="/quiz-kaydet">
@@ -29,6 +30,7 @@
         </div>
       </form>
     </div>
+    <% } %>
 
     <% sonuclar.forEach(function(s, i) { %>
       <div class="soru-sonuc <%= s.dogruMu ? 'dogru' : 'yanlis' %>">

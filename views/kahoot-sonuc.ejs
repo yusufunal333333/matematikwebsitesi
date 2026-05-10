@@ -25,6 +25,7 @@
     </div>
 
     <!-- Sonuç Kaydetme Formu -->
+    <% if (!kaydedildi) { %>
     <div class="kaydet-formu" style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
       <h3>📝 Sonucunuzu Liderboardu'na Kaydedin</h3>
       <form method="POST" action="/kahoot-kaydet">
@@ -37,6 +38,7 @@
         </div>
       </form>
     </div>
+    <% } %>
 
     <h3 style="margin-top: 2rem; margin-bottom: 1rem;">📊 Cevaplarımız</h3>
     <% sonuclar.forEach(function(s, i) { %>
