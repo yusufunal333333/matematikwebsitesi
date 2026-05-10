@@ -130,7 +130,7 @@ nav {
 /* Nav links - visible horizontally on desktop */
 .nav-links {
   list-style: none;
-  display: none;
+  display: flex;
   flex: 1;
   flex-wrap: wrap;
   align-items: center;
@@ -190,12 +190,7 @@ nav {
 
 /* Nav direkt - hidden on desktop (links already in nav-links), shown on mobile */
 .nav-direkt {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  flex-shrink: 0;
-  z-index: 100;
+  display: none;
 }
 
 .nav-direkt a {
@@ -702,8 +697,27 @@ footer {
     border-radius: 0;
   }
 
+  .nav-direkt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
   .nav-direkt a {
-    padding: 6px 14px;
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 9pt;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nav-direkt a.aktif {
+    background: #fbbf24;
+    color: #1e3a5f;
   }
 
   main {
