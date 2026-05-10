@@ -27,38 +27,61 @@
   .soru-no { background: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 6px; display: inline-block; margin-bottom: 1rem; font-weight: bold; }
 </style>
 
-<div class="kahoot-container">
-  <h1 style="text-align: center; color: #3b82f6; margin-bottom: 2rem;">&#9889; Kahoot Quizi</h1>
-  <div class="ilerleme">
-    <div class="ilerleme-bar" id="ilerleme" style="width: 0%;"></div>
+<div class="quiz-layout">
+  <div class="quiz-sol">
+    <div class="kahoot-container">
+      <h1 style="text-align: center; color: #3b82f6; margin-bottom: 2rem;">&#9889; Kahoot Quizi</h1>
+      <div class="ilerleme">
+        <div class="ilerleme-bar" id="ilerleme" style="width: 0%;"></div>
+      </div>
+
+      <form method="POST" action="/kahoot" id="kahootForm">
+        <% for (var i = 0; i < sorular.length; i++) { %>
+          <div class="soru-box<%= i === 0 ? ' aktif' : '' %>" id="soru_<%= i %>">
+            <div class="soru-no">Soru <%= i + 1 %> / <%= sorular.length %></div>
+            <h2 class="soru-baslik"><%= sorular[i].soru %></h2>
+            <div class="secenekler">
+              <% for (var j = 0; j < sorular[i].secenekler.length; j++) { %>
+                <label class="secenek-label">
+                  <input type="radio" name="soru_<%= i %>" value="<%= sorular[i].secenekler[j] %>" required>
+                  <div class="box renk-<%= j %>"><%= sorular[i].secenekler[j] %></div>
+                </label>
+              <% } %>
+            </div>
+            <div class="butonlar">
+              <% if (i > 0) { %>
+                <button type="button" class="btn btn-onceki" onclick="git(<%= i %>, <%= i - 1 %>)">&#8592; Onceki</button>
+              <% } %>
+              <% if (i < sorular.length - 1) { %>
+                <button type="button" class="btn btn-sonraki" onclick="git(<%= i %>, <%= i + 1 %>)">Sonraki &#8594;</button>
+              <% } else { %>
+                <button type="submit" class="btn btn-bitir">&#10003; Bitir</button>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+      </form>
+    </div>
   </div>
 
-  <form method="POST" action="/kahoot" id="kahootForm">
-    <% for (var i = 0; i < sorular.length; i++) { %>
-      <div class="soru-box<%= i === 0 ? ' aktif' : '' %>" id="soru_<%= i %>">
-        <div class="soru-no">Soru <%= i + 1 %> / <%= sorular.length %></div>
-        <h2 class="soru-baslik"><%= sorular[i].soru %></h2>
-        <div class="secenekler">
-          <% for (var j = 0; j < sorular[i].secenekler.length; j++) { %>
-            <label class="secenek-label">
-              <input type="radio" name="soru_<%= i %>" value="<%= sorular[i].secenekler[j] %>" required>
-              <div class="box renk-<%= j %>"><%= sorular[i].secenekler[j] %></div>
-            </label>
-          <% } %>
-        </div>
-        <div class="butonlar">
-          <% if (i > 0) { %>
-            <button type="button" class="btn btn-onceki" onclick="git(<%= i %>, <%= i - 1 %>)">&#8592; Onceki</button>
-          <% } %>
-          <% if (i < sorular.length - 1) { %>
-            <button type="button" class="btn btn-sonraki" onclick="git(<%= i %>, <%= i + 1 %>)">Sonraki &#8594;</button>
-          <% } else { %>
-            <button type="submit" class="btn btn-bitir">&#10003; Bitir</button>
-          <% } %>
-        </div>
-      </div>
-    <% } %>
-  </form>
+  <div class="quiz-sag">
+    <div class="liderlik-tablosu">
+      <h3>🏆 Kahoot Liderlik (Top 10)</h3>
+      <% if (liderlik && liderlik.length === 0) { %>
+        <p class="liderlik-bos">Liderlik panosu henüz boş. Yarışmayı tamamlayarak ilk olabilirsin!</p>
+      <% } else if (liderlik) { %>
+        <ol class="liderlik-listesi">
+          <% liderlik.forEach(function(k, i) { %>
+            <li class="liderlik-satir <%= i === 0 ? 'lider-altin' : i === 1 ? 'lider-gumus' : i === 2 ? 'lider-bronz' : '' %>" style="padding: 0.75rem; margin-bottom: 0.5rem; background: <%= i === 0 ? '#fef3c7' : i === 1 ? '#f3f4f6' : i === 2 ? '#fed7aa' : 'white' %>; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span class="lider-sira" style="font-weight: bold; width: 30px;"><%= i + 1 %>.</span>
+              <span class="lider-isim" style="flex: 1;"><%= k.ad %> <%= k.soyad %></span>
+              <span class="lider-puan" style="font-weight: bold; background: #2563eb; color: white; padding: 0.25rem 0.75rem; border-radius: 4px;"><%= k.dogru %>/<%= k.toplam %></span>
+            </li>
+          <% }); %>
+        </ol>
+      <% } %>
+    </div>
+  </div>
 </div>
 
 <script>

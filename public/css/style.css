@@ -130,14 +130,14 @@ nav {
 /* Nav links - visible horizontally on desktop */
 .nav-links {
   list-style: none;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
+  display: none;
   flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 0;
   margin: 0;
   padding: 0;
-  overflow-x: auto;
+  overflow-x: visible;
 }
 
 /* When hamburger is clicked on desktop, show as dropdown */
@@ -153,8 +153,7 @@ nav {
   padding: 0.5rem 0;
   z-index: 150;
   gap: 0;
-  max-height: 80vh;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .nav-links.acik li {
@@ -191,7 +190,33 @@ nav {
 
 /* Nav direkt - hidden on desktop (links already in nav-links), shown on mobile */
 .nav-direkt {
-  display: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.nav-direkt a {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 9pt;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-direkt a:hover {
+  background: rgba(255,255,255,0.25);
+  text-decoration: none;
+}
+
+.nav-direkt a.aktif {
+  background: #fbbf24;
+  color: #1e3a5f;
 }
 
 /* Main */
@@ -677,26 +702,8 @@ footer {
     border-radius: 0;
   }
 
-  .nav-direkt {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: auto;
-  }
-
   .nav-direkt a {
-    color: #fff;
-    background: rgba(255,255,255,0.15);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 9pt;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .nav-direkt a.aktif {
-    background: #fbbf24;
-    color: #1e3a5f;
+    padding: 6px 14px;
   }
 
   main {

@@ -49,9 +49,6 @@ async function tabloOlustur() {
       ADD COLUMN IF NOT EXISTS quiz_type VARCHAR(20) DEFAULT 'quiz'
     `);
     
-    // Tüm eski verileri sil - sıfırdan başla
-    await pool.query(`DELETE FROM liderlik`);
-    
     const count = await pool.query('SELECT COUNT(*) as sayi FROM liderlik');
     console.log('Liderlik tablosu hazır - mevcut kayıt sayısı:', count.rows[0].sayi);
   } catch (e) {
